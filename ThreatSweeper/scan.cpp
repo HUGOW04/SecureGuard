@@ -8,7 +8,7 @@ Scan::Scan()
 void Scan::recursiveIterator()
 {
 #ifdef _WIN32
-    std::string path = "C:\\";
+    std::string path = "C:\\Users\\hugo\\Pictures\\Screenshots";
     std::string skipDirs[] = {
         "C:\\Windows\\System32\\DriverStore",
         "C:\\Windows\\Temp",
@@ -35,7 +35,6 @@ void Scan::recursiveIterator()
         try {
             std::string strPath = it->path().string();
             logFile << strPath << std::endl;
-
             bool shouldSkip = false;
             for (int i = 0; i < skipCount; i++)
             {
@@ -44,7 +43,7 @@ void Scan::recursiveIterator()
                     shouldSkip = true;
                     if (it->is_directory())
                     {
-                        it.disable_recursion_pending(); // Hoppa över underkataloger helt
+                        it.disable_recursion_pending(); // Hoppa Ã¶ver underkataloger helt
                     }
                     break;
                 }
@@ -59,6 +58,8 @@ void Scan::recursiveIterator()
                     continue;
 
                 compareSHA256File(strPath);
+                std::string fileHash = fileToSHA256(strPath);
+                checkFileChange(strPath, fileHash);
             }
 
         }
@@ -70,9 +71,106 @@ void Scan::recursiveIterator()
     }
 }
 
+std::string Scan::filePermission(const std::string& filePath)
+{
+    std::filesystem::perms p = std::filesystem::status(filePath).permissions();
+    std::string permStr;
+
+    permStr += ((p & std::filesystem::perms::owner_read) != std::filesystem::perms::none) ? 'r' : '-';
+    permStr += ((p & std::filesystem::perms::owner_write) != std::filesystem::perms::none) ? 'w' : '-';
+    permStr += ((p & std::filesystem::perms::owner_exec) != std::filesystem::perms::none) ? 'x' : '-';
+
+    permStr += ((p & std::filesystem::perms::group_read) != std::filesystem::perms::none) ? 'r' : '-';
+    permStr += ((p & std::filesystem::perms::group_write) != std::filesystem::perms::none) ? 'w' : '-';
+    permStr += ((p & std::filesystem::perms::group_exec) != std::filesystem::perms::none) ? 'x' : '-';
+
+    permStr += ((p & std::filesystem::perms::others_read) != std::filesystem::perms::none) ? 'r' : '-';
+    permStr += ((p & std::filesystem::perms::others_write) != std::filesystem::perms::none) ? 'w' : '-';
+    permStr += ((p & std::filesystem::perms::others_exec) != std::filesystem::perms::none) ? 'x' : '-';
+
+    return permStr;
+}
+
+bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
+{
+    // Ensure the file exists (create if not)
+    std::ofstream touchFile("heuristic_log.txt", std::ios::app);
+    touchFile.close();
+
+    std::string permission = filePermission(filePath);
+
+    // Read all lines
+    std::ifstream readfile("heuristic_log.txt");
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+    bool changed = false;
+
+    while (std::getline(readfile, line))
+    {
+        size_t firstComma = line.find(',');
+        if (firstComma == std::string::npos)
+        {
+            lines.push_back(line);
+            continue;
+        }
+        size_t secondComma = line.find(',', firstComma + 1);
+        if (secondComma == std::string::npos)
+        {
+            lines.push_back(line);
+            continue;
+        }
+
+        std::string existingPath = line.substr(0, firstComma);
+        std::string existingHash = line.substr(firstComma + 1, secondComma - firstComma - 1);
+        std::string existingPerm = line.substr(secondComma + 1);
+
+        if (existingPath == filePath)
+        {
+            found = true;
+            if (existingHash != hash || existingPerm != permission)
+            {
+                // Update line with new hash and permission
+                line = filePath + "," + hash + "," + permission;
+                changed = true;
+            }
+            // else no change, keep line as is
+        }
+        lines.push_back(line);
+    }
+    readfile.close();
+
+    if (!found)
+    {
+        // Append new entry
+        lines.push_back(filePath + "," + hash + "," + permission);
+        changed = false; // It's new, so no "change", just added
+        std::cout << "Writing new file entry!" << std::endl;
+    }
+    else if (changed)
+    {
+        std::cout << "File info updated for " << filePath << std::endl;
+    }
+    else
+    {
+        // No change detected
+        return false;
+    }
+
+    // Write back all lines to file
+    std::ofstream writefile("heuristic_log.txt", std::ios::trunc);
+    for (const auto& l : lines)
+    {
+        writefile << l << "\n";
+    }
+    writefile.close();
+
+    return changed;
+}
 
 
-std::string Scan::fileToSHA256(std::string& filePath)
+
+std::string Scan::fileToSHA256(const std::string& filePath)
 {
     FILE* file = nullptr;
     unsigned char buf[8192];
@@ -131,10 +229,10 @@ std::string Scan::fileToSHA256(std::string& filePath)
 }
 
 
-bool Scan::compareSHA256File(std::string& hashPath)
+bool Scan::compareSHA256File(const std::string& hashPath)
 {
     std::string hash = fileToSHA256(hashPath);
-    std::cout << "Hash: " <<hash<<" Path: "<<hashPath<<std::endl;
+    //std::cout << "Hash: " <<hash<<" Path: "<<hashPath<<std::endl;
     if (hash_set.find(hash) != hash_set.end())
     {
         std::cout << "Found: " <<hash<<" Path: "<<hashPath<<std::endl;
@@ -145,7 +243,7 @@ bool Scan::compareSHA256File(std::string& hashPath)
 }
 
 
-bool Scan::compareSHA256Str(std::string& hashStr)
+bool Scan::compareSHA256Str(const std::string& hashStr)
 {
     if (hash_set.find(hashStr) != hash_set.end())
     {
