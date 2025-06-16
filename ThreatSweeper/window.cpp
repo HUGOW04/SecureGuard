@@ -1,16 +1,23 @@
 #include "window.h"
 
 Window::Window(int width, int height, const char* title)
-: m_Width(width),m_Height(height),m_Title(title)
+    : m_Width(width), m_Height(height), m_Title(title)
 {
     initGLFW();
     createWindow();
     initWindowContext();
     m_Overview = std::make_unique<Overview>(m_Window);
+
+    m_Proxy = std::make_unique<Proxy>();
+    m_Proxy->start();  // Start proxy on a separate thread
 }
 
 Window::~Window()
 {
+    if (m_Proxy) {
+        m_Proxy->stop();  // Stop proxy thread and join
+    }
+
     glfwDestroyWindow(m_Window);
     glfwTerminate();
 }
@@ -21,20 +28,20 @@ GLFWwindow* Window::getWindow()
 
 void Window::initGLFW()
 {
-    if(!glfwInit())
+    if (!glfwInit())
     {
-        std::cout<<"Failed to initialize glfw"<<std::endl;
+        std::cout << "Failed to initialize glfw" << std::endl;
     }
 }
 
 void Window::createWindow()
 {
-    m_Window = glfwCreateWindow(m_Width,m_Height,m_Title,nullptr,nullptr);
-    if(!m_Window)
+    m_Window = glfwCreateWindow(m_Width, m_Height, m_Title, nullptr, nullptr);
+    if (!m_Window)
     {
-        std::cout<<"Failed to create glfwWindow"<<std::endl;
+        std::cout << "Failed to create glfwWindow" << std::endl;
     }
-    
+
 }
 
 void Window::initWindowContext()
@@ -54,7 +61,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 
 void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0,0,width,height);
+    glViewport(0, 0, width, height);
 }
 
 void Window::handleEvents()
@@ -62,6 +69,8 @@ void Window::handleEvents()
     while (!glfwWindowShouldClose(m_Window))
     {
         m_Overview->Render();
-        /* code */
+        
+        glfwSwapBuffers(m_Window);   // Swap the front/back buffers so you see the rendering
+        glfwPollEvents();            // Process window events such as closing, input, resize, etc.
     }
 }
