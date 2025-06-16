@@ -57,9 +57,17 @@ void Scan::recursiveIterator()
                 if (std::filesystem::file_size(it->path()) > maxFileSize)
                     continue;
 
-                compareSHA256File(strPath);
+                if (compareSHA256File(strPath))
+                {
+                    std::cout << "Warning: File is in SHA-256 virus database! -> " << strPath << std::endl;
+                    // maybe prompt quarantine, re-scan, etc.
+                }
+
                 std::string fileHash = fileToSHA256(strPath);
-                checkFileChange(strPath, fileHash);
+                if (checkFileChange(strPath, fileHash)) {
+                    std::cout << "Warning: File has changed since last scan! -> " << strPath << std::endl;
+                    // maybe prompt quarantine, re-scan, etc.
+                }
             }
 
         }
