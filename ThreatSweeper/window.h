@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "overview.h"
+#include "proxy.h"
 
 class Window
 {
@@ -23,10 +24,10 @@ private:
     void initGLFW();
     void createWindow();
 
-
 private:
     GLFWwindow* m_Window;
     std::unique_ptr<Overview> m_Overview;
+    std::unique_ptr<Proxy> m_Proxy;
     int m_Width;
     int m_Height;
     int m_Vsync = 1;
