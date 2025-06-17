@@ -8,7 +8,7 @@ Scan::Scan()
 void Scan::recursiveIterator()
 {
 #ifdef _WIN32
-    std::string path = "C:\\Users\\hugo\\Pictures\\Screenshots";
+    std::string path = "C:\\Users\\hugo\\source\\repos\\ThreatSweeper\\ThreatSweeper";
     std::string skipDirs[] = {
         "C:\\Windows\\System32\\DriverStore",
         "C:\\Windows\\Temp",
@@ -56,7 +56,12 @@ void Scan::recursiveIterator()
             {
                 if (std::filesystem::file_size(it->path()) > maxFileSize)
                     continue;
+                if (hasMagicBytes(strPath))
+                {
+                    // maybe prompt quarantine, re-scan, etc.
+                }
 
+                
                 if (compareSHA256File(strPath))
                 {
                     std::cout << "Warning: File is in SHA-256 virus database! -> " << strPath << std::endl;
@@ -68,6 +73,8 @@ void Scan::recursiveIterator()
                     std::cout << "Warning: File has changed since last scan! -> " << strPath << std::endl;
                     // maybe prompt quarantine, re-scan, etc.
                 }
+
+
             }
 
         }
@@ -97,6 +104,57 @@ std::string Scan::filePermission(const std::string& filePath)
     permStr += ((p & std::filesystem::perms::others_exec) != std::filesystem::perms::none) ? 'x' : '-';
 
     return permStr;
+}
+
+bool Scan::hasMagicBytes(const std::string& filePath)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file.is_open()) {
+        return false; // File couldn't be opened
+    }
+
+    std::string strExtension = std::filesystem::path(filePath).extension().string();
+
+    try {
+        uint32_t expectedMagic = extensionMagicMap.at(strExtension);
+
+        // Determine how many bytes to read based on the expected magic value
+        uint32_t readMagic = 0;
+
+        if (expectedMagic <= 0xFFFF) {
+            // 2-byte magic number (like PE files: 0x5A4D)
+            uint16_t magic16;
+            file.read(reinterpret_cast<char*>(&magic16), sizeof(magic16));
+            if (!file) {
+                return false; // Read failed
+            }
+            readMagic = magic16;
+        }
+        else {
+            // 4-byte magic number
+            file.read(reinterpret_cast<char*>(&readMagic), sizeof(readMagic));
+            if (!file) {
+                return false; // Read failed
+            }
+        }
+
+        file.close();
+
+        if (expectedMagic == readMagic) {
+            //std::cout << "value and magic is the same " << filePath << std::endl;
+            return false; // Magic bytes match - file is legitimate
+        }
+        else {
+            std::cout << "Value not the same for file: " << filePath << std::endl;
+            std::cout << "Expected: 0x" << std::hex << expectedMagic
+                << " Read: 0x" << readMagic << std::dec << std::endl;
+            return true; // Magic bytes don't match - potential threat
+        }
+    }
+    catch (const std::exception&) {
+        file.close();
+        return false; // Extension not found in map or other error
+    }
 }
 
 bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
