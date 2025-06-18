@@ -22,6 +22,7 @@ private:
     bool checkFileChange(const std::string& filePath, const std::string& hash);
     std::string filePermission(const std::string& filePath);
     bool hasMagicBytes(const std::string& filePath);
+    void removeFile(const std::string& filePath);
 private:
     std::unordered_set<std::string> hash_set;
     std::unordered_map<std::string, uint32_t> extensionMagicMap = {
