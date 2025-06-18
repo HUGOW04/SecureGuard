@@ -8,7 +8,7 @@ Scan::Scan()
 void Scan::recursiveIterator()
 {
 #ifdef _WIN32
-    std::string path = "C:\\Users\\hugo\\source\\repos\\ThreatSweeper\\ThreatSweeper";
+    std::string path = "C:\\Users\\hugo\\Pictures\\Screenshots";
     std::string skipDirs[] = {
         "C:\\Windows\\System32\\DriverStore",
         "C:\\Windows\\Temp",
@@ -65,7 +65,9 @@ void Scan::recursiveIterator()
                 if (compareSHA256File(strPath))
                 {
                     std::cout << "Warning: File is in SHA-256 virus database! -> " << strPath << std::endl;
-                    // maybe prompt quarantine, re-scan, etc.
+                    std::cout << "Removing file ->" << strPath << std::endl;
+                    removeFile(strPath); // Remove infected file
+                    continue; // Skip further checks for deleted file
                 }
 
                 std::string fileHash = fileToSHA256(strPath);
@@ -84,6 +86,11 @@ void Scan::recursiveIterator()
             continue;
         }
     }
+}
+
+void Scan::removeFile(const std::string& filePath)
+{  
+    remove(filePath.c_str());
 }
 
 std::string Scan::filePermission(const std::string& filePath)
@@ -298,10 +305,9 @@ std::string Scan::fileToSHA256(const std::string& filePath)
 bool Scan::compareSHA256File(const std::string& hashPath)
 {
     std::string hash = fileToSHA256(hashPath);
-    //std::cout << "Hash: " <<hash<<" Path: "<<hashPath<<std::endl;
+    std::cout << "Path: "<<hashPath<< " Hash: " << hash << std::endl;
     if (hash_set.find(hash) != hash_set.end())
     {
-        std::cout << "Found: " <<hash<<" Path: "<<hashPath<<std::endl;
         return true;
     }
 
