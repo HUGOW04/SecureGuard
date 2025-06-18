@@ -40,7 +40,6 @@ private:
     {".pptx",  0x04034B50},   // PPTX is a ZIP
     {".rar",   0x21726152},   // RAR! (52 61 72 21)
     {".7z",    0x377ABCAF},   // 7z archive (37 7A BC AF)
-    {".tar",   0x00000000},   // No fixed magic bytes
     {".gz",    0x8B1F},       // 1F 8B
     {".xz",    0xFD377A58},   // FD 37 7A 58
     {".mp3",   0xFFE3FFFB},   // FF FB (or FF F3, FF F2)
@@ -62,9 +61,6 @@ private:
     {".ps",    0x25215053},   // %!PS (25 21 50 53)
     {".sqlite",0x53514C69},   // SQLite format 3 (53 51 4C 69)
     {".db",    0x53514C69},   // Same as SQLite
-    {".bin",   0x00000000},   // Varies
-    {".dat",   0x00000000},   // Varies
-    {".ini", 0x00000000},  // no fixed magic bytes
     };
 
 
