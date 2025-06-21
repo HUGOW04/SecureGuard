@@ -3,12 +3,13 @@
 Scan::Scan()
 {
     load_hashes();
+    getStartupApplications();
 }
 
 void Scan::recursiveIterator()
 {
-#ifdef _WIN32
-    std::string path = "C:\\Users\\hugo\\Pictures\\Screenshots";
+
+    std::string path = "C:\\Users\\hugo\\source\\repos\\ThreatSweeper\\ThreatSweeper";
     std::string skipDirs[] = {
         "C:\\Windows\\System32\\DriverStore",
         "C:\\Windows\\Temp",
@@ -17,13 +18,7 @@ void Scan::recursiveIterator()
         "C:\\System Volume Information"
     };
     int skipCount = sizeof(skipDirs) / sizeof(skipDirs[0]);
-#endif
 
-#ifdef __unix__
-    std::string path = "/";
-    std::string skipDirs[] = { "/proc","/sys","/dev","/run" };
-    int skipCount = sizeof(skipDirs) / sizeof(skipDirs[0]);
-#endif
 
     std::ofstream logFile("logfile.txt");
     const size_t maxFileSize = 100 * 1024 * 1024; // 100MB
@@ -93,22 +88,49 @@ void Scan::removeFile(const std::string& filePath)
     remove(filePath.c_str());
 }
 
+void Scan::getStartupApplications()
+{
+    char username[1024];
+    DWORD username_len = 1024;
+    GetUserNameA(username, &username_len);
+    
+
+    std::string startUpPath = "C:/Users/" + std::string(username) + std::string("/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup");
+    std::cout << startUpPath << std::endl;
+
+    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(startUpPath))
+    {
+        std::string fileName = dir_entry.path().filename().string();
+        std::cout << fileName << std::endl;
+    }
+
+    std::string globalStartup = "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Startup";
+    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(globalStartup))
+    {
+        std::string fileName = dir_entry.path().filename().string();
+        std::cout << fileName << std::endl;
+    }
+
+    // LÄGG TILL SÅ DEN JÄMFÖR MED EN FIL FRÅN FÖRRA GÅNGEN
+    
+}
+
 std::string Scan::filePermission(const std::string& filePath)
 {
-    std::filesystem::perms p = std::filesystem::status(filePath).permissions();
     std::string permStr;
 
-    permStr += ((p & std::filesystem::perms::owner_read) != std::filesystem::perms::none) ? 'r' : '-';
-    permStr += ((p & std::filesystem::perms::owner_write) != std::filesystem::perms::none) ? 'w' : '-';
-    permStr += ((p & std::filesystem::perms::owner_exec) != std::filesystem::perms::none) ? 'x' : '-';
+    std::ifstream in(filePath);
+    permStr += in.good() ? 'r' : '-';
+    in.close();
 
-    permStr += ((p & std::filesystem::perms::group_read) != std::filesystem::perms::none) ? 'r' : '-';
-    permStr += ((p & std::filesystem::perms::group_write) != std::filesystem::perms::none) ? 'w' : '-';
-    permStr += ((p & std::filesystem::perms::group_exec) != std::filesystem::perms::none) ? 'x' : '-';
+    // Test write (append-mode, no truncation)
+    std::ofstream out(filePath, std::ios::app);
+    permStr += out.good() ? 'w' : '-';
+    out.close();
 
-    permStr += ((p & std::filesystem::perms::others_read) != std::filesystem::perms::none) ? 'r' : '-';
-    permStr += ((p & std::filesystem::perms::others_write) != std::filesystem::perms::none) ? 'w' : '-';
-    permStr += ((p & std::filesystem::perms::others_exec) != std::filesystem::perms::none) ? 'x' : '-';
+    // Test execute (based on file extension)
+    std::string ext = std::filesystem::path(filePath).extension().string();
+    permStr += (ext == ".exe" || ext == ".bat" || ext == ".cmd" || ext == ".com") ? 'x' : '-';
 
     return permStr;
 }
