@@ -20,7 +20,7 @@ void Scan::recursiveIterator()
     int skipCount = sizeof(skipDirs) / sizeof(skipDirs[0]);
 
 
-    std::ofstream logFile("logfile.txt");
+    
     const size_t maxFileSize = 100 * 1024 * 1024; // 100MB
 
     for (auto it = std::filesystem::recursive_directory_iterator(
@@ -28,8 +28,11 @@ void Scan::recursiveIterator()
         it != std::filesystem::recursive_directory_iterator(); ++it)
     {
         try {
+            std::ofstream logFile("logfile.txt",std::ios::app);
             std::string strPath = it->path().string();
             logFile << strPath << std::endl;
+            logFile.close();
+
             bool shouldSkip = false;
             for (int i = 0; i < skipCount; i++)
             {
@@ -91,49 +94,68 @@ void Scan::removeFile(const std::string& filePath)
 void Scan::getStartupApplications()
 {
     char username[1024];
-    DWORD username_len = 1024;
+    DWORD username_len = sizeof(username);
     GetUserNameA(username, &username_len);
-    
 
-    std::string startUpPath = "C:/Users/" + std::string(username) + std::string("/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup");
-    std::cout << startUpPath << std::endl;
+    std::string userStartupPath = "C:/Users/" + std::string(username) + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup";
+    std::string globalStartupPath = "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Startup";
 
-    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(startUpPath))
+    std::vector<std::string> currentStartupFiles;
+
+    // Collect current startup files from user startup folder
+    for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(userStartupPath))
     {
-        std::string fileName = dir_entry.path().filename().string();
-        std::cout << fileName << std::endl;
+        std::string filePath = dirEntry.path().string();
+        if (dirEntry.path().extension() != ".ini")
+        {
+            currentStartupFiles.push_back(filePath);
+        }
     }
 
-    std::string globalStartup = "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Startup";
-    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(globalStartup))
+    // Collect current startup files from global startup folder
+    for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(globalStartupPath))
     {
-        std::string fileName = dir_entry.path().filename().string();
-        std::cout << fileName << std::endl;
+        std::string filePath = dirEntry.path().string();
+        if (dirEntry.path().extension() != ".ini")
+        {
+            currentStartupFiles.push_back(filePath);
+        }
     }
 
-    // LÄGG TILL SÅ DEN JÄMFÖR MED EN FIL FRÅN FÖRRA GÅNGEN
-    
+    // Ensure startup_log.txt exists (create if missing)
+    std::ofstream createFile("startup_log.txt", std::ios::app);
+    createFile.close();
+
+    // Read previous startup entries from file
+    std::ifstream readFile("startup_log.txt");
+    std::string line;
+    std::vector<std::string> previousStartupFiles;
+    while (std::getline(readFile, line))
+    {
+        previousStartupFiles.push_back(line);
+    }
+    readFile.close();
+
+    // Detect and print newly added startup files
+    for (const auto& file : currentStartupFiles)
+    {
+        if (std::find(previousStartupFiles.begin(), previousStartupFiles.end(), file) == previousStartupFiles.end())
+        {
+            std::cout << "[Warning] " << file << " has been added to startup folders." << std::endl;
+        }
+    }
+
+    // Overwrite startup_log.txt with current startup files
+    std::ofstream writeFile("startup_log.txt", std::ios::trunc);
+    for (const auto& file : currentStartupFiles)
+    {
+        writeFile << file << "\n";
+    }
+    writeFile.close();
 }
 
-std::string Scan::filePermission(const std::string& filePath)
-{
-    std::string permStr;
 
-    std::ifstream in(filePath);
-    permStr += in.good() ? 'r' : '-';
-    in.close();
 
-    // Test write (append-mode, no truncation)
-    std::ofstream out(filePath, std::ios::app);
-    permStr += out.good() ? 'w' : '-';
-    out.close();
-
-    // Test execute (based on file extension)
-    std::string ext = std::filesystem::path(filePath).extension().string();
-    permStr += (ext == ".exe" || ext == ".bat" || ext == ".cmd" || ext == ".com") ? 'x' : '-';
-
-    return permStr;
-}
 
 bool Scan::hasMagicBytes(const std::string& filePath)
 {
@@ -192,8 +214,6 @@ bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
     std::ofstream touchFile("heuristic_log.txt", std::ios::app);
     touchFile.close();
 
-    std::string permission = filePermission(filePath);
-
     // Read all lines
     std::ifstream readfile("heuristic_log.txt");
     std::vector<std::string> lines;
@@ -203,30 +223,23 @@ bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
 
     while (std::getline(readfile, line))
     {
-        size_t firstComma = line.find(',');
-        if (firstComma == std::string::npos)
-        {
-            lines.push_back(line);
-            continue;
-        }
-        size_t secondComma = line.find(',', firstComma + 1);
-        if (secondComma == std::string::npos)
+        size_t comma = line.find(',');
+        if (comma == std::string::npos)
         {
             lines.push_back(line);
             continue;
         }
 
-        std::string existingPath = line.substr(0, firstComma);
-        std::string existingHash = line.substr(firstComma + 1, secondComma - firstComma - 1);
-        std::string existingPerm = line.substr(secondComma + 1);
+        std::string existingPath = line.substr(0, comma);
+        std::string existingHash = line.substr(comma + 1);
 
         if (existingPath == filePath)
         {
             found = true;
-            if (existingHash != hash || existingPerm != permission)
+            if (existingHash != hash)
             {
-                // Update line with new hash and permission
-                line = filePath + "," + hash + "," + permission;
+                // Update line with new hash
+                line = filePath + "," + hash;
                 changed = true;
             }
             // else no change, keep line as is
@@ -238,8 +251,8 @@ bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
     if (!found)
     {
         // Append new entry
-        lines.push_back(filePath + "," + hash + "," + permission);
-        changed = false; // It's new, so no "change", just added
+        lines.push_back(filePath + "," + hash);
+        changed = false; // New file entry, not considered a change
         std::cout << "Writing new file entry!" << std::endl;
     }
     else if (changed)
@@ -262,6 +275,7 @@ bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
 
     return changed;
 }
+
 
 
 
@@ -327,7 +341,7 @@ std::string Scan::fileToSHA256(const std::string& filePath)
 bool Scan::compareSHA256File(const std::string& hashPath)
 {
     std::string hash = fileToSHA256(hashPath);
-    std::cout << "Path: "<<hashPath<< " Hash: " << hash << std::endl;
+    //std::cout << "Path: "<<hashPath<< " Hash: " << hash << std::endl;
     if (hash_set.find(hash) != hash_set.end())
     {
         return true;
