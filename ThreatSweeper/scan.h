@@ -22,7 +22,6 @@ public:
 private:
     void load_hashes();
     bool checkFileChange(const std::string& filePath, const std::string& hash);
-    std::string filePermission(const std::string& filePath);
     bool hasMagicBytes(const std::string& filePath);
     void removeFile(const std::string& filePath);
     void getStartupApplications();
