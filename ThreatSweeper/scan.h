@@ -6,6 +6,8 @@
 #include <fstream>
 #include <openssl/evp.h>
 #include <sstream>
+#include <Windows.h>
+#include <Lmcons.h>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -23,6 +25,7 @@ private:
     std::string filePermission(const std::string& filePath);
     bool hasMagicBytes(const std::string& filePath);
     void removeFile(const std::string& filePath);
+    void getStartupApplications();
 private:
     std::unordered_set<std::string> hash_set;
     std::unordered_map<std::string, uint32_t> extensionMagicMap = {
