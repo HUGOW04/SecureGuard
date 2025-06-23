@@ -7,7 +7,7 @@
 #include <openssl/evp.h>
 #include <sstream>
 #include <Windows.h>
-#include <Lmcons.h>
+#include <psapi.h>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -19,12 +19,15 @@ public:
     std::string fileToSHA256(const std::string& filePath);
     bool compareSHA256File(const std::string& hashPath);
     bool compareSHA256Str(const std::string& hashStr);
+    void ScanMemory();
 private:
     void load_hashes();
     bool checkFileChange(const std::string& filePath, const std::string& hash);
     bool hasMagicBytes(const std::string& filePath);
     void removeFile(const std::string& filePath);
     void getStartupApplications();
+    std::string calculate_sha256(const char* data, size_t size);
+    std::string GetProcessName(DWORD pid);
 private:
     std::unordered_set<std::string> hash_set;
     std::unordered_map<std::string, uint32_t> extensionMagicMap = {
