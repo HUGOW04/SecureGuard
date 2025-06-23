@@ -91,6 +91,99 @@ void Scan::removeFile(const std::string& filePath)
     remove(filePath.c_str());
 }
 
+std::string Scan::GetProcessName(DWORD pid)
+{
+    std::string processName = "Unknown";
+
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+    if (hProcess)
+    {
+        char buffer[MAX_PATH];
+        DWORD size = MAX_PATH;
+
+        if (QueryFullProcessImageNameA(hProcess, 0, buffer, &size))
+        {
+            std::string fullPath(buffer);
+            size_t pos = fullPath.find_last_of("\\/");
+            if (pos != std::string::npos)
+                processName = fullPath.substr(pos + 1);
+            else
+                processName = fullPath;
+        }
+        CloseHandle(hProcess);
+    }
+
+    return processName;
+}
+
+void Scan::ScanMemory()
+{
+    DWORD aProcesses[1024], cbNeeded, cProcesses;
+    if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded)) {
+        std::cerr << "Failed to enumerate processes." << std::endl;
+        return;
+    }
+
+    cProcesses = cbNeeded / sizeof(DWORD);
+
+    for (size_t i = 0; i < cProcesses; ++i)
+    {
+        DWORD pid = aProcesses[i];
+        if (pid == 0)
+            continue;
+
+        HANDLE hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION | PROCESS_TERMINATE, FALSE, pid);
+        if (!hProcess)
+            continue;
+
+        std::cout << "Scanning PID: " << pid << std::endl;
+
+        MEMORY_BASIC_INFORMATION mbi;
+        unsigned char* addr = nullptr;
+
+        while (VirtualQueryEx(hProcess, addr, &mbi, sizeof(mbi)) == sizeof(mbi))
+        {
+            // Only scan committed, readable memory that's not guarded or inaccessible
+            if ((mbi.State == MEM_COMMIT) &&
+                !(mbi.Protect & PAGE_GUARD) &&
+                !(mbi.Protect & PAGE_NOACCESS))
+            {
+                std::vector<char> buffer(mbi.RegionSize);
+                SIZE_T bytesRead;
+
+                if (ReadProcessMemory(hProcess, mbi.BaseAddress, buffer.data(), mbi.RegionSize, &bytesRead))
+                {
+                    std::string hash = calculate_sha256(buffer.data(), bytesRead);
+                    std::string processName = GetProcessName(pid);
+
+                    if (!compareSHA256Str(hash))
+                    {
+                        std::ofstream log("malware_memory_log.txt", std::ios::app);
+                        log << "Detected malware in PID: " << pid << " (" << processName << ")" << "\n";
+                        log << "Base Address: " << mbi.BaseAddress << "\n";
+                        log << "Region Size: " << mbi.RegionSize << "\n";
+                        log << "SHA-256: " << hash << "\n\n";
+
+                        std::cout << "Possible malware found!" << std::endl;
+                        std::cout << "Process: " << processName << " (PID " << pid << ")" << std::endl;
+                        std::cout << "Base Address: " << mbi.BaseAddress << std::endl;
+                        std::cout << "Region Size: " << mbi.RegionSize << std::endl;
+                        std::cout << "Matching SHA-256: " << hash << std::endl;
+
+                        //TerminateProcess(hProcess, 1);
+                    }
+                }
+            }
+
+            addr += mbi.RegionSize; // Move to next region
+        }
+
+        CloseHandle(hProcess);
+    }
+}
+
+
+
 void Scan::getStartupApplications()
 {
     char username[1024];
@@ -277,7 +370,40 @@ bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
 }
 
 
+std::string Scan::calculate_sha256(const char* data, size_t size)
+{
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    if (!ctx) {
+        return "";
+    }
 
+    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1) {
+        EVP_MD_CTX_free(ctx);
+        return "";
+    }
+
+    if (EVP_DigestUpdate(ctx, data, size) != 1) {
+        EVP_MD_CTX_free(ctx);
+        return "";
+    }
+
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+
+    if (EVP_DigestFinal_ex(ctx, hash, &hash_len) != 1) {
+        EVP_MD_CTX_free(ctx);
+        return "";
+    }
+
+    EVP_MD_CTX_free(ctx);
+
+    std::ostringstream oss;
+    for (unsigned int i = 0; i < hash_len; ++i) {
+        oss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    }
+
+    return oss.str();
+}
 
 std::string Scan::fileToSHA256(const std::string& filePath)
 {
