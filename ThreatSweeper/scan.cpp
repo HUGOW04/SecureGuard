@@ -156,7 +156,7 @@ void Scan::ScanMemory()
                     std::string hash = calculate_sha256(buffer.data(), bytesRead);
                     std::string processName = GetProcessName(pid);
 
-                    if (!compareSHA256Str(hash))
+                    if (compareSHA256Str(hash))
                     {
                         std::ofstream log("malware_memory_log.txt", std::ios::app);
                         log << "Detected malware in PID: " << pid << " (" << processName << ")" << "\n";
@@ -170,7 +170,7 @@ void Scan::ScanMemory()
                         std::cout << "Region Size: " << mbi.RegionSize << std::endl;
                         std::cout << "Matching SHA-256: " << hash << std::endl;
 
-                        //TerminateProcess(hProcess, 1);
+                        TerminateProcess(hProcess, 1);
                     }
                 }
             }
