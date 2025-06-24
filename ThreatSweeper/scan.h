@@ -26,10 +26,71 @@ private:
     bool hasMagicBytes(const std::string& filePath);
     void removeFile(const std::string& filePath);
     void getStartupApplications();
-    std::string calculate_sha256(const char* data, size_t size);
     std::string GetProcessName(DWORD pid);
 private:
     std::unordered_set<std::string> hash_set;
+    std::unordered_set<std::string> ignoreProcesses = {
+        // System and Windows processes
+        "System Idle Process",
+        "System",
+        "wininit.exe",
+        "csrss.exe",
+        "smss.exe",
+        "winlogon.exe",
+        "services.exe",
+        "lsass.exe",
+        "svchost.exe",
+        "explorer.exe",
+        "taskhostw.exe",
+        "dwm.exe",
+        "spoolsv.exe",
+
+        // Browsers and extensions
+        "msedge.exe",
+        "chrome.exe",
+        "firefox.exe",
+        "opera.exe",
+
+        // Antivirus and security software
+        "MsMpEng.exe",             // Windows Defender
+        "SecurityHealthService.exe",
+
+        // Development tools
+        "devenv.exe",              // Visual Studio
+        "code.exe",                // VS Code
+        "MSBuild.exe",
+
+        // Other common apps
+        "LockApp.exe",
+        "RuntimeBroker.exe",
+        "PhoneExperienceHost.exe",
+        "Discord.exe",
+        "steam.exe",
+        "steamwebhelper.exe",
+        "msedgewebview2.exe",
+        "Surfshark.exe",
+        "brave.exe",
+        "RadeonSoftware.exe",
+        "AMDRSSrcExt.exe",
+        "CrossDeviceService.exe",
+
+        // Microsoft ServiceHub and related processes
+        "Microsoft.ServiceHub.Controller.exe",
+        "ServiceHub.VSDetouredHost.exe",
+        "PerfWatson2.exe",
+        "ServiceHub.IdentityHost.exe",
+        "ServiceHub.ThreadedWaitDialog.exe",
+        "ServiceHub.IntellicodeModelService.exe",
+        "ServiceHub.IndexingService.exe",
+        "vctip.exe",
+        "ServiceHub.Host.dotnet.x64.exe",
+        "ServiceHub.TestWindowStoreHost.exe",
+        "ServiceHub.DataWarehouseHost.exe"
+    };
+
+
+
+
     std::unordered_map<std::string, uint32_t> extensionMagicMap = {
     {".exe",   0x5A4D},       // MZ (4D 5A)
     {".dll",   0x5A4D},       // MZ (same as .exe)
