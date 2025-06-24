@@ -153,25 +153,26 @@ void Scan::ScanMemory()
 
                 if (ReadProcessMemory(hProcess, mbi.BaseAddress, buffer.data(), mbi.RegionSize, &bytesRead))
                 {
-                    std::string hash = calculate_sha256(buffer.data(), bytesRead);
                     std::string processName = GetProcessName(pid);
 
-                    if (compareSHA256Str(hash))
-                    {
-                        std::ofstream log("malware_memory_log.txt", std::ios::app);
-                        log << "Detected malware in PID: " << pid << " (" << processName << ")" << "\n";
-                        log << "Base Address: " << mbi.BaseAddress << "\n";
-                        log << "Region Size: " << mbi.RegionSize << "\n";
-                        log << "SHA-256: " << hash << "\n\n";
+                    // Check if the memory region has EXECUTE + WRITE permissions
+                    bool hasExecWrite = (mbi.Protect & PAGE_EXECUTE_READWRITE) || (mbi.Protect & PAGE_EXECUTE_WRITECOPY);
 
-                        std::cout << "Possible malware found!" << std::endl;
-                        std::cout << "Process: " << processName << " (PID " << pid << ")" << std::endl;
-                        std::cout << "Base Address: " << mbi.BaseAddress << std::endl;
-                        std::cout << "Region Size: " << mbi.RegionSize << std::endl;
-                        std::cout << "Matching SHA-256: " << hash << std::endl;
+                    // Check if the process is NOT in the ignore list
+                    bool isNotIgnored = ignoreProcesses.find(processName) == ignoreProcesses.end();
 
-                        TerminateProcess(hProcess, 1);
+                    if (hasExecWrite && isNotIgnored) {
+                        std::cout << "[!] Suspicious memory protection (EXECUTE + WRITE) at: " << mbi.BaseAddress << std::endl;
+                        std::cout << "Process: " << processName << " (PID " << pid << ")" << std::endl;  // <-- added this line
+
+                        std::ofstream log("memory_suspicious_log.txt", std::ios::app);
+                        log << "Suspicious region (EXECUTE_WRITE): " << mbi.BaseAddress << "\n";
+                        log << "PID: " << pid << " (" << processName << ")" << "\n";
+                        log << "Region Size: " << mbi.RegionSize << " bytes\n\n";
+
+                        //TerminateProcess(hProcess, 1);
                     }
+                  
                 }
             }
 
@@ -367,42 +368,6 @@ bool Scan::checkFileChange(const std::string& filePath, const std::string& hash)
     writefile.close();
 
     return changed;
-}
-
-
-std::string Scan::calculate_sha256(const char* data, size_t size)
-{
-    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
-    if (!ctx) {
-        return "";
-    }
-
-    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1) {
-        EVP_MD_CTX_free(ctx);
-        return "";
-    }
-
-    if (EVP_DigestUpdate(ctx, data, size) != 1) {
-        EVP_MD_CTX_free(ctx);
-        return "";
-    }
-
-    unsigned char hash[EVP_MAX_MD_SIZE];
-    unsigned int hash_len;
-
-    if (EVP_DigestFinal_ex(ctx, hash, &hash_len) != 1) {
-        EVP_MD_CTX_free(ctx);
-        return "";
-    }
-
-    EVP_MD_CTX_free(ctx);
-
-    std::ostringstream oss;
-    for (unsigned int i = 0; i < hash_len; ++i) {
-        oss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
-    }
-
-    return oss.str();
 }
 
 std::string Scan::fileToSHA256(const std::string& filePath)
