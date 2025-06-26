@@ -51,6 +51,7 @@ void Window::initWindowContext()
     glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
     // Enable/Disable m_Vsync: 1 for VSync on, 0 for VSync off
     glfwSwapInterval(m_Vsync ? 1 : 0);
+    glOrtho(0.0, m_Width, 0.0, m_Height, 0.0, 1.0); // this creates a canvas you can do 2D drawing on
 }
 
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -66,6 +67,7 @@ void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height
 
 void Window::handleEvents()
 {
+
     while (!glfwWindowShouldClose(m_Window))
     {
         m_Overview->Render();
