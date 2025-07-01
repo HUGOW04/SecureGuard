@@ -32,6 +32,8 @@ Window::Window(int width, int height, const char* title)
     overviewWidget.push_back(Widget(180, 110, 120, 80, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(320, 110, 180, 80, &lastSystemScan, "Last System Scan", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(180, 210, 140, 80, &startupProcesses, "Startup Processes", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(340, 210, 160, 80, &cpuUsage, "CPU Usage", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(520, 210, 160, 80, &memoryUsage, "Memory Usage", m_Italic.get(), m_Italic.get()));
     //overviewWidget.push_back(Widget(200, 300, 100, 50, "gell"));
 
     m_Sidebar = std::make_unique<Sidebar>(sideBarButtons);
@@ -166,6 +168,49 @@ void Window::renderFont(Font* font, float x, float y,const std::string& text,flo
     }
 }
 
+unsigned long long Window::fileTimeToInt64(const FILETIME& ft) {
+    return (((unsigned long long)(ft.dwHighDateTime)) << 32) | ((unsigned long long)ft.dwLowDateTime);
+}
+
+float Window::calculateCPULoad(unsigned long long idleTicks, unsigned long long totalTicks) {
+    unsigned long long totalTicksSinceLast = totalTicks - previousTotalTicks;
+    unsigned long long idleTicksSinceLast = idleTicks - previousIdleTicks;
+
+    previousTotalTicks = totalTicks;
+    previousIdleTicks = idleTicks;
+
+    if (totalTicksSinceLast == 0) return 0.0f;
+    return 1.0f - ((float)idleTicksSinceLast / totalTicksSinceLast);
+}
+
+float Window::getTotalCPULoad() {
+    FILETIME idleTime, kernelTime, userTime;
+    if (!GetSystemTimes(&idleTime, &kernelTime, &userTime))
+        return -1.0f;
+
+    unsigned long long idle = fileTimeToInt64(idleTime);
+    unsigned long long kernel = fileTimeToInt64(kernelTime);
+    unsigned long long user = fileTimeToInt64(userTime);
+
+    unsigned long long total = kernel + user;
+    return calculateCPULoad(idle, total) * 100.0f;
+}
+
+float Window::getTotalMemoryLoad()
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+
+    DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+    DWORDLONG availPhysMem = memInfo.ullAvailPhys;
+    DWORDLONG usedPhysMem = totalPhysMem - availPhysMem;
+
+    double usedRatio = static_cast<double>(usedPhysMem) / static_cast<double>(totalPhysMem);
+
+    return usedRatio * 100;
+}
+
 void Window::loadAllLogs()
 {
     loadSystemScanLog();
@@ -239,6 +284,18 @@ void Window::handleEvents()
            renderFont(m_LightItalic.get(), 180.0f, 40.0f, "Security Overview", 1.0f, 1.0f, 1.0f, 1.0f);
            renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
            m_Overview->render();
+           auto now = std::chrono::steady_clock::now();
+           auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCpuSampleTime);
+
+           if (elapsed.count() >= 1000) // 1000ms = 1s
+           {
+               float cpuLoad = getTotalCPULoad();
+               float memoryLoad = getTotalMemoryLoad();
+               cpuUsage = std::to_string(static_cast<int>(cpuLoad)) + "%";
+               memoryUsage = std::to_string(static_cast<int>(memoryLoad)) + "%";
+              
+               lastCpuSampleTime = now;
+           }
         }
         else if (firewall)
         {
