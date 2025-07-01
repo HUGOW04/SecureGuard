@@ -34,6 +34,13 @@ private:
     void loadAllLogs();
     void loadSystemScanLog();
     void loadStartupProcessesLog();
+
+    // Memory
+    float getTotalMemoryLoad();
+    // CPU
+    float getTotalCPULoad();
+    float calculateCPULoad(unsigned long long idleTicks, unsigned long long totalTicks);
+    unsigned long long fileTimeToInt64(const FILETIME& ft);
 private:
     GLFWwindow* m_Window;
     std::unique_ptr<Overview> m_Overview;
@@ -46,15 +53,22 @@ private:
     int m_Vsync = 1;
     const char* m_Title;
 
+    // Static state for calculating CPU deltas
+    unsigned long long previousTotalTicks = 0;
+    unsigned long long previousIdleTicks = 0;
+    std::chrono::steady_clock::time_point lastCpuSampleTime;
+
     // render
     bool overview = true;
     bool firewall = false;
     bool scan = false;
     
-    // values
+    // render values
     std::string threatsFound = "0";
     std::string lastSystemScan = "never";
     std::string startupProcesses = "0";
+    std::string cpuUsage = "0%";
+    std::string memoryUsage = "0%";
 
     // fonts
     std::unique_ptr<Font> m_LightItalic;
