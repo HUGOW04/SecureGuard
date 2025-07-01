@@ -4,7 +4,6 @@
 #include "scan.h"
 
 
-
 int main(int argc, char** argv) 
 {
     /*
@@ -17,22 +16,21 @@ int main(int argc, char** argv)
     Window window(800,600,"ThreatSweeper");
     window.handleEvents();
 
-
     /*
     TO DO
     (DONE) Signature scanning
     (DONE) Real-time file system monitoring
     (DONE) Heuristic detection
     (DONE) Memory monitor (scan RAM for threats)
+    (DONE) Autorun (monitor startup apps/processes)
+    (DONE) System tray (CPU/Memory stats)
 
     (PARTIALLY DONE) GUI (OpenGL integration)
-    (PARTIALLY DONE) Autorun (monitor startup apps/processes)
     
     (NOT IMPLEMENTED) Quarantine systems (isolate/remove threats)
     (NOT IMPLEMENTED) Sandbox execution (run suspicious code safely)
     (NOT IMPLEMENTED) Behavior analysis (track program actions) 
     (NOT IMPLEMENTED) Network Scan
-    (NOT IMPLEMENTED) System tray (CPU/Memory stats)
 
     (MAYBE IMPLEMENT) Maskin learning (detect unknown malware)
     */
