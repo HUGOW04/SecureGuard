@@ -50,7 +50,7 @@ void Scan::recursiveIterator()
                     shouldSkip = true;
                     if (it->is_directory())
                     {
-                        it.disable_recursion_pending(); // Hoppa över underkataloger helt
+                        it.disable_recursion_pending(); // Hoppa Ã¶ver underkataloger helt
                     }
                     break;
                 }
@@ -233,69 +233,52 @@ void Scan::ScanMemory()
         std::cerr << "Failed to enumerate processes." << std::endl;
         return;
     }
-
     cProcesses = cbNeeded / sizeof(DWORD);
-
     for (size_t i = 0; i < cProcesses; ++i)
     {
         DWORD pid = aProcesses[i];
         if (pid == 0)
             continue;
-
         HANDLE hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION | PROCESS_TERMINATE, FALSE, pid);
         if (!hProcess)
             continue;
-
         std::string scanningLog = "Scanning PID: " + std::to_string(pid);
         logBuffer.push_back(scanningLog);
-
         MEMORY_BASIC_INFORMATION mbi;
         unsigned char* addr = nullptr;
-
         while (VirtualQueryEx(hProcess, addr, &mbi, sizeof(mbi)) == sizeof(mbi))
         {
-            // Only scan committed, readable memory that's not guarded or inaccessible
             if ((mbi.State == MEM_COMMIT) &&
                 !(mbi.Protect & PAGE_GUARD) &&
                 !(mbi.Protect & PAGE_NOACCESS))
             {
-                std::vector<char> buffer(mbi.RegionSize);
-                SIZE_T bytesRead;
-
-                if (ReadProcessMemory(hProcess, mbi.BaseAddress, buffer.data(), mbi.RegionSize, &bytesRead))
-                {
-                    std::string processName = GetProcessName(pid);
-
-                    // Check if the memory region has EXECUTE + WRITE permissions
-                    bool hasExecWrite = (mbi.Protect & PAGE_EXECUTE_READWRITE) || (mbi.Protect & PAGE_EXECUTE_WRITECOPY);
-
-                    // Check if the process is NOT in the ignore list
-                    bool isNotIgnored = ignoreProcesses.find(processName) == ignoreProcesses.end();
-
-                    if (hasExecWrite && isNotIgnored) {
-                        std::cout << "[!] Suspicious memory protection (EXECUTE + WRITE) at: " << mbi.BaseAddress << std::endl;
-                        std::cout << "Process: " << processName << " (PID " << pid << ")" << std::endl;  // <-- added this line
-
+                std::string processName = GetProcessName(pid);
+                bool hasExecWrite = (mbi.Protect & PAGE_EXECUTE_READWRITE) || (mbi.Protect & PAGE_EXECUTE_WRITECOPY);
+                bool isNotIgnored = ignoreProcesses.find(processName) == ignoreProcesses.end();
+                if (hasExecWrite && isNotIgnored) {
+                    std::cout << "[!] Suspicious memory protection (EXECUTE + WRITE) at: " << mbi.BaseAddress << std::endl;
+                    std::cout << "Process: " << processName << " (PID " << pid << ")" << std::endl;
+                    {
                         std::ofstream log("logs/memory_suspicious_log.txt", std::ios::app);
-                        log << "Suspicious region (EXECUTE_WRITE): " << mbi.BaseAddress << "\n";
-                        log << "PID: " << pid << " (" << processName << ")" << "\n";
-                        log << "Region Size: " << mbi.RegionSize << " bytes\n\n";
-
-                        // Make one single formatted string and push it to threatBuffer
-                        std::string threatEntry = "[EXECUTE_WRITE] Region: " + std::to_string(reinterpret_cast<uintptr_t>(mbi.BaseAddress)) +
-                            ", PID: " + std::to_string(pid) +
-                            " (" + processName + "), Size: " + std::to_string(mbi.RegionSize) + " bytes";
-
-                        threatBuffer.push_back(threatEntry);
-                        //TerminateProcess(hProcess, 1);
+                        if (log.is_open()) {
+                            log << "Suspicious region (EXECUTE_WRITE): " << mbi.BaseAddress << "\n";
+                            log << "PID: " << pid << " (" << processName << ")" << "\n";
+                            log << "Region Size: " << mbi.RegionSize << " bytes\n\n";
+                        }
                     }
-                  
+                    std::string threatEntry = "[EXECUTE_WRITE] Region: " + std::to_string(reinterpret_cast<uintptr_t>(mbi.BaseAddress)) +
+                        ", PID: " + std::to_string(pid) +
+                        " (" + processName + "), Size: " + std::to_string(mbi.RegionSize) + " bytes";
+                    threatBuffer.push_back(threatEntry);
+                    //TerminateProcess(hProcess, 1);
                 }
             }
-
-            addr += mbi.RegionSize; // Move to next region
+            // Prevent infinite loop
+            if (addr > (unsigned char*)MAXUINT_PTR - mbi.RegionSize) {
+                break;
+            }
+            addr += mbi.RegionSize;
         }
-
         CloseHandle(hProcess);
     }
 }
@@ -377,7 +360,7 @@ bool Scan::hasMagicBytes(const std::string& filePath)
     auto it = extensionMagicMap.find(ext);
 
     if (it == extensionMagicMap.end()) {
-        // Extension not in magic map — skip checking, assume OK
+        // Extension not in magic map â€” skip checking, assume OK
         return true;
     }
 
