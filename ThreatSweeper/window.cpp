@@ -1,5 +1,6 @@
 #include "window.h"
 
+
 Window::Window(int width, int height, const char* title)
     : m_Width(width), m_Height(height), m_Title(title)
 {
@@ -28,9 +29,9 @@ Window::Window(int width, int height, const char* title)
     m_Light = std::make_unique<Font>("fonts/Lato-Light.ttf", 20.0f);
 
     // sidebar buttons
-    sidebarButtons.push_back(Button(20, 20,  200,40, "Overview", "overview", m_Italic.get()));
-    sidebarButtons.push_back(Button(20, 70,  200, 40, "Firewall", "firewall", m_Italic.get()));
-    sidebarButtons.push_back(Button(20, 120, 200, 40, "Scan", "scan", m_Italic.get()));
+    sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Italic.get()));
+    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Italic.get()));
+    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Italic.get()));
     //sidebarButtons.push_back(Button(10, 160, 130, 30, "Privacy", "privacy", m_Italic.get()));
     //sidebarButtons.push_back(Button(10, 210, 130, 30, "Settings", "settings", m_Italic.get()));
 
@@ -39,7 +40,11 @@ Window::Window(int width, int height, const char* title)
     systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get()));
 
     // overview widget
-    overviewWidget.push_back(Widget(260, 110, 120, 120, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
+
+    
+    overviewWidget.push_back(Widget(265, 110, 190, 140, &lastSystemScan, "Security Status", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(475, 110, 190, 140, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(685, 110, 190, 140, &lastSystemScan, "Updates", m_Italic.get(), m_Italic.get()));
     //overviewWidget.push_back(Widget(320, 110, 180, 80, &lastSystemScan, "Last System Scan", m_Italic.get(), m_Italic.get()));
     //overviewWidget.push_back(Widget(180, 210, 140, 80, &startupProcesses, "Startup Processes", m_Italic.get(), m_Italic.get()));
     //overviewWidget.push_back(Widget(340, 210, 160, 80, &cpuUsage, "CPU Usage", m_Italic.get(), m_Italic.get()));
@@ -110,7 +115,21 @@ void Window::createWindow()
 
     glfwSetWindowUserPointer(m_Window, this);
 
+
+    GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(primary);
+
+    int screen_width = mode->width;
+    int screen_height = mode->height;
+
+
+    int pos_x = (screen_width - m_Width) / 2;
+    int pos_y = (screen_height - m_Height) / 2;
+
+    glfwSetWindowPos(m_Window, pos_x, pos_y);
+
 }
+
 
 void Window::initWindowContext()
 {
@@ -217,6 +236,7 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
 
     if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT)
     {
+        std::cout << "x: " << mouseX << " y: " << mouseY << std::endl;
         // Enable window dragging if clicked in top 40 pixels
         if (mouseY <= 40.0f)
         {
@@ -519,8 +539,9 @@ void Window::handleEvents()
 
         if (overview)
         {
+
             //Security Overview
-            renderFont(m_Bold.get(), 260.0f, 40.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Bold.get(), 260.0f, 60.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
            //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
            m_Overview->render();
            auto now = std::chrono::steady_clock::now();
