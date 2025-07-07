@@ -47,8 +47,8 @@ void Widget::render()
 
     if (m_ValueFont && m_ValueFont->isValid() && m_ValueText)
     {
-        float centerX = x_Pos + 10;
-        float valueY = y_Pos + m_Height * 0.35f;
+        float centerX = x_Pos + 35;
+        float valueY = y_Pos + m_Height - 20.0f;
 
         m_ValueFont->setColor(1.0f, 1.0f, 1.0f, 0.9f);
         m_ValueFont->render(*m_ValueText, centerX, valueY, 1.0f);
@@ -56,8 +56,8 @@ void Widget::render()
 
     if (m_LabelFont && m_LabelFont->isValid())
     {
-        float labelX = x_Pos + 10;
-        float labelY = y_Pos + m_Height - 20.0f;
+        float labelX = x_Pos + 35;
+        float labelY = y_Pos + m_Height * 0.35f;
 
         m_LabelFont->setColor(1.0f, 1.0f, 1.0f, 1.0f);
         m_LabelFont->render(m_LabelText, labelX, labelY, 1.0f);
