@@ -1,6 +1,5 @@
 #include "window.h"
 
-
 Window::Window(int width, int height, const char* title)
     : m_Width(width), m_Height(height), m_Title(title)
 {
@@ -24,31 +23,23 @@ Window::Window(int width, int height, const char* title)
     initWindowContext();
 
     m_Italic = std::make_unique<Font>("fonts/Lato-Italic.ttf", 20.0f);
-    m_LightItalic = std::make_unique<Font>("fonts/Lato-LightItalic.ttf", 40.0f);
-    m_Bold = std::make_unique<Font>("fonts/Lato-Bold.ttf", 30.0f);
+    m_Regular = std::make_unique<Font>("fonts/Roboto-Light.ttf", 20.0f);
+    m_Bold = std::make_unique<Font>("fonts/Roboto-Bold.ttf", 30.0f);
     m_Light = std::make_unique<Font>("fonts/Lato-Light.ttf", 20.0f);
 
     // sidebar buttons
-    sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Italic.get()));
-    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Italic.get()));
-    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Italic.get()));
-    //sidebarButtons.push_back(Button(10, 160, 130, 30, "Privacy", "privacy", m_Italic.get()));
-    //sidebarButtons.push_back(Button(10, 210, 130, 30, "Settings", "settings", m_Italic.get()));
+    sidebarButtons.push_back(Button(20, 60,  200,40, "Overview", "overview", m_Regular.get()));
+    sidebarButtons.push_back(Button(20, 110,  200, 40, "Firewall", "firewall", m_Regular.get()));
+    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get()));
 
     // system buttons
     systemButtons.push_back(Button(m_Width-20, 0, 20, 20, "x", "x", m_Italic.get()));
     systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get()));
 
     // overview widget
-
-    
     overviewWidget.push_back(Widget(265, 110, 190, 140, &lastSystemScan, "Security Status", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(475, 110, 190, 140, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(685, 110, 190, 140, &lastSystemScan, "Updates", m_Italic.get(), m_Italic.get()));
-    //overviewWidget.push_back(Widget(320, 110, 180, 80, &lastSystemScan, "Last System Scan", m_Italic.get(), m_Italic.get()));
-    //overviewWidget.push_back(Widget(180, 210, 140, 80, &startupProcesses, "Startup Processes", m_Italic.get(), m_Italic.get()));
-    //overviewWidget.push_back(Widget(340, 210, 160, 80, &cpuUsage, "CPU Usage", m_Italic.get(), m_Italic.get()));
-    //overviewWidget.push_back(Widget(520, 210, 160, 80, &memoryUsage, "Memory Usage", m_Italic.get(), m_Italic.get()));
     
     // scanbuttons
     scanButtons.push_back(Button(180, 110, 100, 30, "Fullscan", "fullscan", m_Italic.get()));
@@ -64,6 +55,9 @@ Window::Window(int width, int height, const char* title)
     toggle.push_back(Toggle(600, 110, 60, 30, m_Bold.get()));
     toggle.push_back(Toggle(600, 160, 60, 30, m_Bold.get()));
 
+    // load image
+    m_LogoImage = std::make_unique<Loadimage>("images/shield.png");
+
     m_Sidebar = std::make_unique<Sidebar>(sidebarButtons);
     m_System = std::make_unique<System>(systemButtons);
     m_Overview = std::make_unique<Overview>(overviewWidget);
@@ -72,7 +66,7 @@ Window::Window(int width, int height, const char* title)
 
 void Window::createDirectorys()
 {
-    std::string dirs[] = {"data","logs","fonts"};
+    std::string dirs[] = {"data","logs","fonts","images"};
     for (const auto& dir : dirs)
     {
         if (!std::filesystem::exists(dir))
@@ -129,7 +123,6 @@ void Window::createWindow()
     glfwSetWindowPos(m_Window, pos_x, pos_y);
 
 }
-
 
 void Window::initWindowContext()
 {
@@ -516,7 +509,12 @@ void Window::handleEvents()
         m_Sidebar->render();
         // sytem buttons
         m_System->render();
-
+        // logo
+        renderFont(m_Bold.get(), 60.0f, 40.0f, "SecureGuard", 1.0f, 1.0f, 1.0f, 1.0f);
+        
+        if (m_LogoImage)
+            m_LogoImage->drawImage(20, 15, 40, 40);
+        
         for (auto& b : sidebarButtons)
         {
             if (overview && b.getName() == "Overview")
@@ -537,11 +535,11 @@ void Window::handleEvents()
             }
         }
 
+
         if (overview)
         {
-
             //Security Overview
-            renderFont(m_Bold.get(), 260.0f, 60.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Bold.get(), 260.0f, 40.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
            //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
            m_Overview->render();
            auto now = std::chrono::steady_clock::now();
