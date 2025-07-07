@@ -18,6 +18,7 @@
 #include "console.h"
 #include "toggle.h"
 #include "system.h"
+#include "loadimage.h"
 #include "tinyfiledialogs.h"
 
 class Window
@@ -59,7 +60,7 @@ private:
     std::unique_ptr<DownloadHash> m_Hash;
     std::unique_ptr<Scanpanel> m_ScanPanel;
     std::unique_ptr<Scan> m_Scan;
-    
+    std::unique_ptr<Loadimage> m_LogoImage;
 
     int m_Width;
     int m_Height;
@@ -86,7 +87,7 @@ private:
     std::string memoryUsage = "0%";
 
     // fonts
-    std::unique_ptr<Font> m_LightItalic;
+    std::unique_ptr<Font> m_Regular;
     std::unique_ptr<Font> m_Italic;
     std::unique_ptr<Font> m_Bold;
     std::unique_ptr<Font> m_Light;
