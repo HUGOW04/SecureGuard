@@ -538,8 +538,8 @@ void Window::handleEvents()
 
         if (overview)
         {
-            //Security Overview
-            renderFont(m_Bold.get(), 260.0f, 40.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
+           //Security Overview
+           renderFont(m_Bold.get(), 260.0f, 60.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
            //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
            m_Overview->render();
            auto now = std::chrono::steady_clock::now();
@@ -557,13 +557,13 @@ void Window::handleEvents()
         }
         else if (firewall)
         {
-            renderFont(m_Bold.get(), 260.0f, 40.0f, "Firewall Protection", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Bold.get(), 260.0f, 60.0f, "Firewall Protection", 1.0f, 1.0f, 1.0f, 1.0f);
             //renderFont(m_Light.get(), 180.0f, 60.0f, "Control network access and monitor connections", 1.0f, 1.0f, 1.0f, 1.0f);
         }
         else if (scan)
         {
-            renderFont(m_Bold.get(), 260.0f, 40.0f, "Scan", 1.0f, 1.0f, 1.0f, 1.0f);
-            renderFont(m_Light.get(), 180.0f, 60.0f, "Real-time malware detection and removal", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Bold.get(), 260.0f, 60.0f, "Scan", 1.0f, 1.0f, 1.0f, 1.0f);
+            //renderFont(m_Light.get(), 180.0f, 60.0f, "Real-time malware detection and removal", 1.0f, 1.0f, 1.0f, 1.0f);
             m_ScanPanel->render();
             
         }
