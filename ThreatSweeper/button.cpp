@@ -11,7 +11,7 @@ void Button::render()
 {
     if (selected)
     {
-        glColor3f(0.22f, 0.88f, 0.80f);
+        glColor3f(0.059f, 0.463f, 0.431f);
     }
     else
     {
