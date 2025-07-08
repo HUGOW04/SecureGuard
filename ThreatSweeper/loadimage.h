@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include "gl_includes.h"
-
+#include "stb_image.h"
 class Loadimage
 {
 public:
