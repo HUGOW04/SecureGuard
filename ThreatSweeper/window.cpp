@@ -5,7 +5,7 @@ Window::Window(int width, int height, const char* title)
 {
     // create dirs to have it orginized!
     createDirectorys();
-   
+
     // Fetch SHA-256 hashes from Bazaar; maybe append more databases later to full_sha256.txt.
     std::ifstream file("data/full_sha256.txt");
     if (!file.good())
@@ -28,12 +28,12 @@ Window::Window(int width, int height, const char* title)
     m_Light = std::make_unique<Font>("fonts/Lato-Light.ttf", 20.0f);
 
     // sidebar buttons
-    sidebarButtons.push_back(Button(20, 60,  200,40, "Overview", "overview", m_Regular.get()));
-    sidebarButtons.push_back(Button(20, 110,  200, 40, "Firewall", "firewall", m_Regular.get()));
+    sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Regular.get()));
+    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Regular.get()));
     sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get()));
 
     // system buttons
-    systemButtons.push_back(Button(m_Width-20, 0, 20, 20, "x", "x", m_Italic.get()));
+    systemButtons.push_back(Button(m_Width - 20, 0, 20, 20, "x", "x", m_Italic.get()));
     systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get()));
 
     // overview widget
@@ -44,7 +44,7 @@ Window::Window(int width, int height, const char* title)
     // Overview quick-actions
     overviewWidget.push_back(Widget(265, 345, 285, 80, &threatsFound, "Run Quick Scan", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(590, 345, 285, 80, &lastSystemScan, "Scan History", m_Italic.get(), m_Italic.get()));
-    
+
     // scanbuttons
     scanButtons.push_back(Button(180, 110, 100, 30, "Fullscan", "fullscan", m_Italic.get()));
     scanButtons.push_back(Button(300, 110, 100, 30, "Fastscan", "fastscan", m_Italic.get()));
@@ -54,7 +54,7 @@ Window::Window(int width, int height, const char* title)
     // consoles
     //consoles.push_back(Console(180, 210, 590, 150, m_Scan->getThreatBuffer(), m_Italic.get()));
     consoles.push_back(Console(260, 340, 620, 140, m_Scan->getLogBuffer(), m_Italic.get()));
-    
+
     // toggle
     toggle.push_back(Toggle(600, 110, 60, 30, m_Bold.get()));
     toggle.push_back(Toggle(600, 160, 60, 30, m_Bold.get()));
@@ -65,12 +65,12 @@ Window::Window(int width, int height, const char* title)
     m_Sidebar = std::make_unique<Sidebar>(sidebarButtons);
     m_System = std::make_unique<System>(systemButtons);
     m_Overview = std::make_unique<Overview>(overviewWidget);
-    m_ScanPanel = std::make_unique<Scanpanel>(scanButtons,consoles,toggle);
+    m_ScanPanel = std::make_unique<Scanpanel>(scanButtons, consoles, toggle);
 }
 
 void Window::createDirectorys()
 {
-    std::string dirs[] = {"data","logs","fonts","images"};
+    std::string dirs[] = { "data","logs","fonts","images" };
     for (const auto& dir : dirs)
     {
         if (!std::filesystem::exists(dir))
@@ -113,6 +113,10 @@ void Window::createWindow()
 
     glfwSetWindowUserPointer(m_Window, this);
 
+    GLFWimage images[1];
+    images[0].pixels = stbi_load("images/shield.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+    glfwSetWindowIcon(m_Window, 1, images);
+    stbi_image_free(images[0].pixels);
 
     GLFWmonitor* primary = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(primary);
@@ -130,7 +134,7 @@ void Window::createWindow()
 
 void Window::initWindowContext()
 {
-    glfwMakeContextCurrent(m_Window); 
+    glfwMakeContextCurrent(m_Window);
     glfwSetKeyCallback(m_Window, key_callback);
     glfwSetCursorPosCallback(m_Window, cursor_position_callback);
     glfwSetMouseButtonCallback(m_Window, mouse_callback);
@@ -254,19 +258,19 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
                     win->scan = false;
 
                 }
-                else if(b.getName() == "Firewall")
+                else if (b.getName() == "Firewall")
                 {
                     win->overview = false;
                     win->firewall = true;
                     win->scan = false;
-               
+
                 }
                 else if (b.getName() == "Scan")
                 {
                     win->overview = false;
                     win->firewall = false;
                     win->scan = true;
-                    
+
 
                 }
 
@@ -286,7 +290,7 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
                 {
                     glfwIconifyWindow(win->m_Window);
                 }
-                
+
             }
         }
         if (win->scan)
@@ -378,12 +382,12 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
 
 
 
-void Window::renderFont(Font* font, float x, float y,const std::string& text,float red,float green,float blue, float alpha)
+void Window::renderFont(Font* font, float x, float y, const std::string& text, float red, float green, float blue, float alpha)
 {
     if (font && font->isValid())
     {
         font->setColor(red, green, blue, alpha);
-        font->render(text, x,y, 1.0f);
+        font->render(text, x, y, 1.0f);
     }
 }
 
@@ -515,10 +519,10 @@ void Window::handleEvents()
         m_System->render();
         // logo
         renderFont(m_Bold.get(), 60.0f, 40.0f, "SecureGuard", 1.0f, 1.0f, 1.0f, 1.0f);
-        
+
         if (m_LogoImage)
             m_LogoImage->drawImage(20, 15, 40, 40);
-        
+
         for (auto& b : sidebarButtons)
         {
             if (overview && b.getName() == "Overview")
@@ -542,23 +546,23 @@ void Window::handleEvents()
 
         if (overview)
         {
-           //Security Overview
-           renderFont(m_Bold.get(), 260.0f, 70.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
-           renderFont(m_Bold.get(), 260.0f, 320.0f, "Quick Actions", 1.0f, 1.0f, 1.0f, 1.0f);
-           //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
-           m_Overview->render();
-           auto now = std::chrono::steady_clock::now();
-           auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCpuSampleTime);
+            //Security Overview
+            renderFont(m_Bold.get(), 260.0f, 70.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Bold.get(), 260.0f, 320.0f, "Quick Actions", 1.0f, 1.0f, 1.0f, 1.0f);
+            //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
+            m_Overview->render();
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCpuSampleTime);
 
-           if (elapsed.count() >= 1000) // 1000ms = 1s
-           {
-               float cpuLoad = getTotalCPULoad();
-               float memoryLoad = getTotalMemoryLoad();
-               cpuUsage = std::to_string(static_cast<int>(cpuLoad)) + "%";
-               memoryUsage = std::to_string(static_cast<int>(memoryLoad)) + "%";
-              
-               lastCpuSampleTime = now;
-           }
+            if (elapsed.count() >= 1000) // 1000ms = 1s
+            {
+                float cpuLoad = getTotalCPULoad();
+                float memoryLoad = getTotalMemoryLoad();
+                cpuUsage = std::to_string(static_cast<int>(cpuLoad)) + "%";
+                memoryUsage = std::to_string(static_cast<int>(memoryLoad)) + "%";
+
+                lastCpuSampleTime = now;
+            }
         }
         else if (firewall)
         {
@@ -570,10 +574,10 @@ void Window::handleEvents()
             renderFont(m_Bold.get(), 260.0f, 60.0f, "Scan", 1.0f, 1.0f, 1.0f, 1.0f);
             //renderFont(m_Light.get(), 180.0f, 60.0f, "Real-time malware detection and removal", 1.0f, 1.0f, 1.0f, 1.0f);
             m_ScanPanel->render();
-            
+
         }
 
-        glfwSwapBuffers(m_Window);   
-        glfwPollEvents();        
+        glfwSwapBuffers(m_Window);
+        glfwPollEvents();
     }
 }
