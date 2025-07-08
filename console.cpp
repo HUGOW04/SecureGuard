@@ -121,7 +121,7 @@ std::vector<std::string> Console::wrapText(const std::string& text, float maxWid
 void Console::render()
 {
     // --- Background ---
-    glColor3f(0.3f, 0.3f, 0.3f);
+    glColor3f(0.2196f, 0.2549f, 0.3137f);
     glBegin(GL_QUADS);
     glVertex2f(x_Pos, y_Pos);
     glVertex2f(x_Pos + m_Width, y_Pos);
