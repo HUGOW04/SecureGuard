@@ -40,6 +40,10 @@ Window::Window(int width, int height, const char* title)
     overviewWidget.push_back(Widget(265, 110, 190, 140, &lastSystemScan, "Security Status", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(475, 110, 190, 140, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(685, 110, 190, 140, &lastSystemScan, "Updates", m_Italic.get(), m_Italic.get()));
+
+    // Overview quick-actions
+    overviewWidget.push_back(Widget(265, 345, 285, 80, &threatsFound, "Run Quick Scan", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(590, 345, 285, 80, &lastSystemScan, "Scan History", m_Italic.get(), m_Italic.get()));
     
     // scanbuttons
     scanButtons.push_back(Button(180, 110, 100, 30, "Fullscan", "fullscan", m_Italic.get()));
@@ -539,7 +543,8 @@ void Window::handleEvents()
         if (overview)
         {
            //Security Overview
-           renderFont(m_Bold.get(), 260.0f, 60.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
+           renderFont(m_Bold.get(), 260.0f, 70.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
+           renderFont(m_Bold.get(), 260.0f, 320.0f, "Quick Actions", 1.0f, 1.0f, 1.0f, 1.0f);
            //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
            m_Overview->render();
            auto now = std::chrono::steady_clock::now();
