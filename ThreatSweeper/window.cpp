@@ -27,14 +27,18 @@ Window::Window(int width, int height, const char* title)
     m_Bold = std::make_unique<Font>("fonts/Roboto-Bold.ttf", 30.0f);
     m_Light = std::make_unique<Font>("fonts/Lato-Light.ttf", 20.0f);
 
+    // load images
+    m_LogoImage = std::make_unique<Loadimage>("images/shield.png");
+    m_HomeImage = std::make_unique<Loadimage>("images/home.png");
+
     // sidebar buttons
-    sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Regular.get()));
-    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Regular.get()));
-    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get()));
+    sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Regular.get(), m_HomeImage.get()));
+    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Regular.get(),NULL));
+    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get(),NULL));
 
     // system buttons
-    systemButtons.push_back(Button(m_Width - 20, 0, 20, 20, "x", "x", m_Italic.get()));
-    systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get()));
+    systemButtons.push_back(Button(m_Width - 20, 0, 20, 20, "x", "x", m_Italic.get(),NULL));
+    systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get(),NULL));
 
     // overview widget
     overviewWidget.push_back(Widget(265, 110, 190, 140, &lastSystemScan, "Security Status", m_Italic.get(), m_Italic.get()));
@@ -46,10 +50,10 @@ Window::Window(int width, int height, const char* title)
     overviewWidget.push_back(Widget(590, 345, 285, 80, &lastSystemScan, "Scan History", m_Italic.get(), m_Italic.get()));
 
     // scanbuttons
-    scanButtons.push_back(Button(180, 110, 100, 30, "Fullscan", "fullscan", m_Italic.get()));
-    scanButtons.push_back(Button(300, 110, 100, 30, "Fastscan", "fastscan", m_Italic.get()));
-    scanButtons.push_back(Button(180, 160, 100, 30, "Filescan", "filescan", m_Italic.get()));
-    scanButtons.push_back(Button(300, 160, 100, 30, "Memoryscan", "memoryscan", m_Italic.get()));
+    scanButtons.push_back(Button(180, 110, 100, 30, "Fullscan", "fullscan", m_Italic.get(),NULL));
+    scanButtons.push_back(Button(300, 110, 100, 30, "Fastscan", "fastscan", m_Italic.get(),NULL));
+    scanButtons.push_back(Button(180, 160, 100, 30, "Filescan", "filescan", m_Italic.get(),NULL));
+    scanButtons.push_back(Button(300, 160, 100, 30, "Memoryscan", "memoryscan", m_Italic.get(),NULL));
 
     // consoles
     //consoles.push_back(Console(180, 210, 590, 150, m_Scan->getThreatBuffer(), m_Italic.get()));
@@ -59,8 +63,8 @@ Window::Window(int width, int height, const char* title)
     toggle.push_back(Toggle(600, 110, 60, 30, m_Bold.get()));
     toggle.push_back(Toggle(600, 160, 60, 30, m_Bold.get()));
 
-    // load image
-    m_LogoImage = std::make_unique<Loadimage>("images/shield.png");
+
+
 
     m_Sidebar = std::make_unique<Sidebar>(sidebarButtons);
     m_System = std::make_unique<System>(systemButtons);
