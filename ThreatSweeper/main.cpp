@@ -6,7 +6,7 @@
 int main(int argc, char** argv) 
 {
 
-    Window window(900,500,"ThreatSweeper");
+    Window window(900,475,"SecureGuard");
     window.handleEvents();
 
     /*
