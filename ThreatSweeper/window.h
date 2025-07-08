@@ -61,6 +61,7 @@ private:
     std::unique_ptr<Scanpanel> m_ScanPanel;
     std::unique_ptr<Scan> m_Scan;
     std::unique_ptr<Loadimage> m_LogoImage;
+    std::unique_ptr<Loadimage> m_HomeImage;
 
     int m_Width;
     int m_Height;
@@ -105,6 +106,7 @@ private:
 
     // toggle
     std::vector<Toggle> toggle;
+
 
 };
 
