@@ -512,6 +512,8 @@ void Window::setupProjection()
     glLoadIdentity();
 }
 
+
+
 void Window::handleEvents()
 {
    
@@ -606,6 +608,12 @@ void Window::handleEvents()
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Setting", 1.0f, 1.0f, 1.0f, 1.0f);
             m_Setting->render();
         }
+        
+        std::time_t t = std::time(nullptr);
+        std::tm now{};
+        localtime_s(&now, &t);
+        std::string footstamp = "© " + std::to_string(now.tm_year + 1900) + " SecureGuard";
+        renderFont(m_Italic.get(), 10.0f, 460.0f, footstamp, 1.0f, 1.0f, 1.0f, 1.0f);
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
