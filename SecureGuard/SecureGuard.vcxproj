@@ -135,6 +135,8 @@
     <ClCompile Include="loadimage.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="overview.cpp" />
+    <ClCompile Include="renderperformance.cpp" />
+    <ClCompile Include="performance.cpp" />
     <ClCompile Include="scan.cpp" />
     <ClCompile Include="scanpanel.cpp" />
     <ClCompile Include="setting.cpp" />
@@ -153,6 +155,8 @@
     <ClInclude Include="gl_includes.h" />
     <ClInclude Include="loadimage.h" />
     <ClInclude Include="overview.h" />
+    <ClInclude Include="performance.h" />
+    <ClInclude Include="renderperformance.h" />
     <ClInclude Include="scan.h" />
     <ClInclude Include="scanpanel.h" />
     <ClInclude Include="setting.h" />
