@@ -79,8 +79,8 @@ Window::Window(int width, int height, const char* title)
         "Starts automatically with your system for continuous protection."
     };
     
-    performances.push_back(Performance(&cpuUsage, m_Regular.get(), 260, 100));
-    performances.push_back(Performance(&memoryUsage, m_Regular.get(), 500, 100));
+    performances.push_back(Performance(&cpuUsage, m_Regular.get(), 260, 120));
+    performances.push_back(Performance(&memoryUsage, m_Regular.get(), 420, 120));
 
     m_Sidebar = std::make_unique<Sidebar>(sidebarButtons);
     m_System = std::make_unique<System>(systemButtons);
@@ -88,8 +88,7 @@ Window::Window(int width, int height, const char* title)
     m_ScanPanel = std::make_unique<Scanpanel>(scanButtons, consoles);
     m_Setting = std::make_unique<Setting>(m_Regular.get(), m_Light.get(),settingsTitle, settingsDescription,settingToggle);
     m_RenderPerformance = std::make_unique<RenderPerformance>(performances);
-
-
+    
 }
 
 void Window::createDirectorys()
@@ -515,7 +514,7 @@ void Window::setupProjection()
 
 void Window::handleEvents()
 {
-
+   
     while (!glfwWindowShouldClose(m_Window))
     {
         glClearColor(0.13f, 0.16f, 0.21f, 0.1f);
@@ -587,6 +586,8 @@ void Window::handleEvents()
         else if (performance)
         {
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Performance", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Italic.get(), 260.0f, 110.0f, "CPU", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Italic.get(), 420.0f, 110.0f, "RAM", 1.0f, 1.0f, 1.0f, 1.0f);
             m_RenderPerformance->render();
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCpuSampleTime);
