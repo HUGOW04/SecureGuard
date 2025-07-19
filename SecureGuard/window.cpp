@@ -35,7 +35,7 @@ Window::Window(int width, int height, const char* title)
     sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Regular.get(), m_HomeImage.get()));
     sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Regular.get(),NULL));
     sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get(),NULL));
-    sidebarButtons.push_back(Button(20, 210, 200, 40, "System", "system", m_Regular.get(), NULL));
+    sidebarButtons.push_back(Button(20, 210, 200, 40, "Performance", "performance", m_Regular.get(), NULL));
     sidebarButtons.push_back(Button(20, 260, 200, 40, "Setting", "setting", m_Regular.get(), NULL));
     
     // system buttons
@@ -79,13 +79,16 @@ Window::Window(int width, int height, const char* title)
         "Starts automatically with your system for continuous protection."
     };
     
-
+    performances.push_back(Performance(&cpuUsage, m_Regular.get(), 260, 100));
+    performances.push_back(Performance(&memoryUsage, m_Regular.get(), 500, 100));
 
     m_Sidebar = std::make_unique<Sidebar>(sidebarButtons);
     m_System = std::make_unique<System>(systemButtons);
     m_Overview = std::make_unique<Overview>(overviewWidget);
     m_ScanPanel = std::make_unique<Scanpanel>(scanButtons, consoles);
     m_Setting = std::make_unique<Setting>(m_Regular.get(), m_Light.get(),settingsTitle, settingsDescription,settingToggle);
+    m_RenderPerformance = std::make_unique<RenderPerformance>(performances);
+
 
 }
 
@@ -277,7 +280,7 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
                 win->overview = (name == "Overview");
                 win->firewall = (name == "Firewall");
                 win->scan = (name == "Scan");
-                win->system = (name == "System");
+                win->performance = (name == "Performance");
                 win->setting = (name == "Setting");
             }
         }
@@ -545,7 +548,7 @@ void Window::handleEvents()
             {
                 b.setSelect(true);
             }
-            else if (system && b.getName() == "System")
+            else if (performance && b.getName() == "Performance")
             {
                 b.setSelect(true);
             }
@@ -565,20 +568,9 @@ void Window::handleEvents()
             //Security Overview
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
             renderFont(m_Bold.get(), 260.0f, 320.0f, "Quick Actions", 1.0f, 1.0f, 1.0f, 1.0f);
-            //renderFont(m_Light.get(), 180.0f, 60.0f, "Your system protection status at a glance", 1.0f, 1.0f, 1.0f, 1.0f);
+            
             m_Overview->render();
-            auto now = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCpuSampleTime);
-
-            if (elapsed.count() >= 1000) // 1000ms = 1s
-            {
-                float cpuLoad = getTotalCPULoad();
-                float memoryLoad = getTotalMemoryLoad();
-                cpuUsage = std::to_string(static_cast<int>(cpuLoad)) + "%";
-                memoryUsage = std::to_string(static_cast<int>(memoryLoad)) + "%";
-
-                lastCpuSampleTime = now;
-            }
+           
         }
         else if (firewall)
         {
@@ -592,10 +584,21 @@ void Window::handleEvents()
             m_ScanPanel->render();
 
         }
-        else if (system)
+        else if (performance)
         {
-            renderFont(m_Bold.get(), 260.0f, 70.0f, "System", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Bold.get(), 260.0f, 70.0f, "Performance", 1.0f, 1.0f, 1.0f, 1.0f);
+            m_RenderPerformance->render();
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCpuSampleTime);
+            if (elapsed.count() >= 1000) // 1000ms = 1s
+            {
+                float cpuLoad = getTotalCPULoad();
+                float memoryLoad = getTotalMemoryLoad();
+                cpuUsage = std::to_string(static_cast<int>(cpuLoad)) + "%";
+                memoryUsage = std::to_string(static_cast<int>(memoryLoad)) + "%";
 
+                lastCpuSampleTime = now;
+            }
         }
         else if (setting)
         {

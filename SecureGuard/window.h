@@ -20,6 +20,8 @@
 #include "system.h"
 #include "loadimage.h"
 #include "setting.h"
+#include "performance.h"
+#include "renderperformance.h"
 #include "tinyfiledialogs.h"
 
 class Window
@@ -62,8 +64,11 @@ private:
     std::unique_ptr<Scanpanel> m_ScanPanel;
     std::unique_ptr<Scan> m_Scan;
     std::unique_ptr<Setting> m_Setting;
+    std::unique_ptr<RenderPerformance> m_RenderPerformance;
+    // images
     std::unique_ptr<Loadimage> m_LogoImage;
     std::unique_ptr<Loadimage> m_HomeImage;
+
 
     int m_Width;
     int m_Height;
@@ -81,7 +86,7 @@ private:
     bool overview = true;
     bool firewall = false;
     bool scan = false;
-    bool system = false;
+    bool performance = false;
     bool setting = false;
     
     // render values
@@ -110,6 +115,9 @@ private:
 
     // toggle
     std::vector<Toggle> settingToggle;
+
+    // performance
+    std::vector<Performance> performances;
 
 
 
