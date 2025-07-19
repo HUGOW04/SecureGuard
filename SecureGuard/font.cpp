@@ -20,16 +20,16 @@ Font::Font(const std::string& ttfPath, float pixelSize)
     std::vector<unsigned char> ttfBuffer((std::istreambuf_iterator<char>(file)),
         std::istreambuf_iterator<char>());
 
-
-
     const int texWidth = 512;
     const int texHeight = 512;
     std::vector<unsigned char> bitmap(texWidth * texHeight);
 
+    // Bake characters 32-191 (160 characters total)
+    // This includes the copyright symbol at 169
     int result = stbtt_BakeFontBitmap(
         ttfBuffer.data(), 0, pixelSize,
         bitmap.data(), texWidth, texHeight,
-        32, 96, cdata
+        32, 160, cdata  // Characters 32 to 191 (32+160-1)
     );
 
     if (result <= 0) {
@@ -40,10 +40,9 @@ Font::Font(const std::string& ttfPath, float pixelSize)
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    // Use GL_RED format; red channel contains glyph alpha
+    // Use GL_RED format for modern OpenGL or GL_ALPHA for legacy
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, texWidth, texHeight, 0,
         GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.data());
-
 
     // Texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -89,8 +88,8 @@ float Font::getTextWidth(const std::string& text, float scale) {
     float xpos = 0.0f;
     float ypos = 0.0f;
 
-    for (char c : text) {
-        if (c < 32 || c >= 128) continue;
+    for (unsigned char c : text) { // Changed to unsigned char to handle extended ASCII
+        if (c < 32 || c > 191) continue; // Changed condition to match baked range
 
         stbtt_aligned_quad q;
         float oldXpos = xpos;
@@ -119,11 +118,11 @@ void Font::render(const std::string& text, float x, float y, float scale) {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    // Enable blending for proper text rendering (use alpha from red channel)
+    // Enable blending for proper text rendering
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Set color to white with alpha (alpha comes from texture's red channel)
+    // Set color
     glColor4f(colorR, colorG, colorB, colorA);
 
     glBegin(GL_QUADS);
@@ -131,17 +130,17 @@ void Font::render(const std::string& text, float x, float y, float scale) {
     float xpos = x;
     float ypos = y;
 
-    for (char c : text) {
-        if (c < 32 || c >= 128) continue;
+    for (unsigned char c : text) { // Changed to unsigned char to handle extended ASCII properly
+        if (c < 32 || c > 191) continue; // Changed condition to match baked range
 
         stbtt_aligned_quad q;
         stbtt_GetBakedQuad(cdata, 512, 512, c - 32, &xpos, &ypos, &q, 1);
 
-        // Scale the quad
-        float x0 = q.x0 * scale;
-        float y0 = q.y0 * scale;
-        float x1 = q.x1 * scale;
-        float y1 = q.y1 * scale;
+        // Apply position offset and scale
+        float x0 = x + (q.x0 - x) * scale;
+        float y0 = y + (q.y0 - y) * scale;
+        float x1 = x + (q.x1 - x) * scale;
+        float y1 = y + (q.y1 - y) * scale;
 
         glTexCoord2f(q.s0, q.t0); glVertex2f(x0, y0);
         glTexCoord2f(q.s1, q.t0); glVertex2f(x1, y0);
