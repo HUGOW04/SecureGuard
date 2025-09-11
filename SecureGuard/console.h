@@ -35,6 +35,7 @@ private:
     float scrollbar_width;
     float scrollbar_height;
     const std::vector<std::string>& m_Buffer;
+    std::vector<std::string> m_BufferCopy; // copy of the buffer
     std::vector<std::string> m_ChangeBuffer;
     Font* m_Font;
 };
