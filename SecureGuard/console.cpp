@@ -8,7 +8,7 @@ Console::Console(float x, float y, float width, float height, const std::vector<
     scrollbar_xPos = x_Pos + m_Width - scrollbar_width;
     scrollbar_yPos = y_Pos;
 
-    
+
 }
 
 void Console::setY(float y)
@@ -201,16 +201,18 @@ void Console::render()
         std::cout << "not the same" << std::endl;
         scrollbar_yPos = y_Pos + m_Height - scrollbar_height;
         m_ChangeBuffer = m_Buffer;
-    }    
+    }
     */
 
     // Fixed rendering code - use full console width
     if (!(m_Font && m_Font->isValid()))
         return;
 
+    m_BufferCopy = m_Buffer; // make a real copy
+
     std::vector<std::string> wrappedLines;
-    for (const auto& line : m_Buffer) {
-        std::vector<std::string> wrapped = wrapText(line, m_Width-20.0f);
+    for (const auto& line : m_BufferCopy) {
+        std::vector<std::string> wrapped = wrapText(line, m_Width - 20.0f);
         wrappedLines.insert(wrappedLines.end(), wrapped.begin(), wrapped.end());
     }
 
