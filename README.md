@@ -1,7 +1,42 @@
-<img width="900" height="475" alt="image" src="https://github.com/user-attachments/assets/f025de6f-79d7-4a71-b803-71a7e2914c98" />
+# Cross-Platform AntiVirus
 
-<img width="900" height="475" alt="image" src="https://github.com/user-attachments/assets/513af7f0-2733-46b5-981a-9fb6544151ff" />
+## Project Overview
+This is an improved version of my previous antivirus application.  
+[View Previous AntiVirus Project](https://github.com/HUGOW04/TuAntivirus)
+
+This project is a cross-platform malware scanner developed in C++ with OpenGL, using SHA-256 hashing for secure file comparison. The application is compatible with Windows, macOS, and Linux, and provides an enhanced interface and improved detection capabilities over the previous version.
+
+---
+
+## Implemented Features
+- **Signature scanning** using SHA-256 hashes for files.  
+- **Memory scanning** for known threats.  
+- **System tray integration** showing CPU and memory statistics.  
+- **Graphical interface** fully implemented with OpenGL.  
+- **Desktop notifications** for scan results.  
+
+---
+
+## Future Improvements
+Planned features include:
+- Real-time file system monitoring and autorun process checks.  
+- Network scanning using WinAPI hooks.  
+- Detection of newly added files before execution with quarantine functionality.  
+- Phishing email protection integrated with "Have I Been Pwned".  
+- Sandbox execution and behavioral analysis for suspicious programs.  
+- Neural network or machine learning integration to detect unknown threats.  
+- Full quarantine system to isolate or remove detected malware.  
+- Kernel-level antivirus integration for deeper system protection.  
+- Automatic updates for virus definitions.  
+- Enhanced heuristic detection to identify zero-day threats.  
+- User-friendly reporting and logging for all actions.  
+
+---
+
+## Screenshots
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="45%"/>
+</p>
 
 
-
-Copyright
+---
