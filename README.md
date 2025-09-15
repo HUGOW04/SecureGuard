@@ -10,8 +10,10 @@ This project is a Windows-based malware scanner developed in C++ with OpenGL, us
 
 ## Implemented Features
 - **Signature scanning** using SHA-256 hashes for files.  
-- **Optimized hash lookup**: Loads the hash database into memory using a `std::unordered_set` and checks hashes using constant-time average lookup (`O(1)`), instead of looping through the file each time (`O(n)`).
+- **Optimized hash lookup**: Loads the hash database into memory using a `std::unordered_set` and checks hashes using constant-time average lookup (`O(1)`), instead of looping through the file each time (`O(n)`).  
 - **Memory scanning** for known threats.  
+- **Real-time autorun process checks** to monitor startup programs.  
+- **Heuristic detection** to identify suspicious behaviors and unknown malware.  
 - **System tray integration** showing CPU and memory statistics.  
 - **Graphical interface** fully implemented with OpenGL.  
 - **Desktop notifications** for scan results.  
@@ -20,7 +22,6 @@ This project is a Windows-based malware scanner developed in C++ with OpenGL, us
 
 ## Future Improvements
 Planned features include:
-- Real-time file system monitoring and autorun process checks.  
 - Network scanning using WinAPI hooks.  
 - Detection of newly added files before execution with quarantine functionality.  
 - Phishing email protection integrated with "Have I Been Pwned".  
@@ -29,7 +30,6 @@ Planned features include:
 - Full quarantine system to isolate or remove detected malware.  
 - Kernel-level antivirus integration for deeper system protection.  
 - Automatic updates for virus definitions.  
-- Enhanced heuristic detection to identify zero-day threats.  
 - User-friendly reporting and logging for all actions.  
 
 ---
@@ -38,5 +38,3 @@ Planned features include:
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="100%"/>
 </p>
-
----
