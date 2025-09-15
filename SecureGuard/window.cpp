@@ -1,4 +1,4 @@
-﻿#include "window.h"
+#include "window.h"
 
 Window::Window(int width, int height, const char* title)
     : m_Width(width), m_Height(height), m_Title(title)
@@ -47,7 +47,7 @@ Window::Window(int width, int height, const char* title)
     systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get(),NULL));
 
     // overview widget
-    overviewWidget.push_back(Widget(265, 110, 190, 140, &lastSystemScan, "Security Status", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(265, 110, 190, 140, &status, "Security Status", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(475, 110, 190, 140, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
     overviewWidget.push_back(Widget(685, 110, 190, 140, &lastSystemScan, "Updates", m_Italic.get(), m_Italic.get()));
 
@@ -847,7 +847,7 @@ void Window::handleEvents()
         std::time_t t = std::time(nullptr);
         std::tm now{};
         localtime_s(&now, &t);
-        std::string footstamp = "© " + std::to_string(now.tm_year + 1900) + " SecureGuard";
+        std::string footstamp = " © " + std::to_string(now.tm_year + 1900) + " SecureGuard";
         renderFont(m_Italic.get(), 10.0f, 460.0f, footstamp, 1.0f, 1.0f, 1.0f, 1.0f);
 
         glfwSwapBuffers(m_Window);
