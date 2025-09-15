@@ -88,7 +88,7 @@ private:
 
     int m_Width;
     int m_Height;
-    int m_Vsync = 1;
+    int m_Vsync = 0;
     const char* m_Title;
     bool draggingWindow = false;
     double dragOffsetX = 0.0, dragOffsetY = 0.0;
@@ -107,6 +107,7 @@ private:
     
     // render values
     std::string threatsFound = "0";
+    std::string status = "Protected";
     std::string lastSystemScan = "never";
     std::string startupProcesses = "0";
     std::string cpuUsage = "0%";
