@@ -9,12 +9,15 @@ This project is a Windows-based malware scanner developed in C++ with OpenGL, us
 ---
 
 ## Implemented Features
+- **Full Scan** – Thoroughly scans the entire system for known malware and threats.  
+- **Fast Scan** – Quickly scans critical system areas to detect common malware efficiently.  
+- **Memory Scan** – Scans running processes and memory for known threats.  
+- **File Scan & Drag-and-Drop** – Allows scanning individual files or dropping them into the application for instant scanning.  
 - **Signature scanning** using SHA-256 hashes for files.  
-- **Optimized hash lookup**: Loads the hash database into memory using a `std::unordered_set` and checks hashes using constant-time average lookup (`O(1)`), instead of looping through the file each time (`O(n)`).  
-- **Memory scanning** for known threats.  
+- **Optimized hash lookup** – Loads the hash database into memory using a `std::unordered_set` and checks hashes using constant-time average lookup (`O(1)`), instead of looping through the file each time (`O(n)`).  
 - **Real-time autorun process checks** to monitor startup programs.  
-- **Heuristic detection** to identify suspicious behaviors and unknown malware.
--  **Improved false positive handling**: Combines process whitelisting, file extension/magic byte verification, and signature checks to reduce unnecessary alerts.  
+- **Heuristic detection** to identify suspicious behaviors and unknown malware.  
+- **Improved false positive handling** – Combines process whitelisting, file extension/magic byte verification, and signature checks to reduce unnecessary alerts.  
 - **User-friendly reporting and logging** for all scan actions and detected threats.  
 - **System tray integration** showing CPU and memory statistics.  
 - **Graphical interface** fully implemented with OpenGL.  
@@ -35,10 +38,9 @@ Planned features include:
 
 ---
 
+
 ## Screenshots
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="100%"/>
-  <img width="900" height="475" alt="Screenshot 2025-09-15 202015" src="https://github.com/user-attachments/assets/823d4dcc-23d2-41d3-a01d-375bc298dd29" />
+  <img width="900" height="475" alt="Screenshot 2025-09-15 214235" src="https://github.com/user-attachments/assets/03d77761-130d-41d7-a61f-6b2cb1c2a334" />
 </p>
-
-
