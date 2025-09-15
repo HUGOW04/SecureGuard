@@ -1,15 +1,16 @@
-# Cross-Platform AntiVirus
+# Windows AntiVirus
 
 ## Project Overview
 This is an improved version of my previous antivirus application.  
 [View Previous AntiVirus Project](https://github.com/HUGOW04/TuAntivirus)
 
-This project is a cross-platform malware scanner developed in C++ with OpenGL, using SHA-256 hashing for secure file comparison. The application is compatible with Windows, macOS, and Linux, and provides an enhanced interface and improved detection capabilities over the previous version.
+This project is a Windows-based malware scanner developed in C++ with OpenGL, using SHA-256 hashing for secure file comparison. It provides an enhanced interface and improved detection capabilities over the previous version.
 
 ---
 
 ## Implemented Features
 - **Signature scanning** using SHA-256 hashes for files.  
+- **Optimized hash lookup**: loads the hash database into memory and uses efficient search (logarithmic time) instead of looping through the file each time.  
 - **Memory scanning** for known threats.  
 - **System tray integration** showing CPU and memory statistics.  
 - **Graphical interface** fully implemented with OpenGL.  
@@ -37,6 +38,5 @@ Planned features include:
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="100%"/>
 </p>
-
 
 ---
