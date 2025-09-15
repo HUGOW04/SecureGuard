@@ -14,6 +14,7 @@ This project is a Windows-based malware scanner developed in C++ with OpenGL, us
 - **Memory scanning** for known threats.  
 - **Real-time autorun process checks** to monitor startup programs.  
 - **Heuristic detection** to identify suspicious behaviors and unknown malware.  
+- **User-friendly reporting and logging** for all scan actions and detected threats.  
 - **System tray integration** showing CPU and memory statistics.  
 - **Graphical interface** fully implemented with OpenGL.  
 - **Desktop notifications** for scan results.  
@@ -30,7 +31,6 @@ Planned features include:
 - Full quarantine system to isolate or remove detected malware.  
 - Kernel-level antivirus integration for deeper system protection.  
 - Automatic updates for virus definitions.  
-- User-friendly reporting and logging for all actions.  
 
 ---
 
