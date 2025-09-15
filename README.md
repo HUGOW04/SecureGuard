@@ -35,7 +35,7 @@ Planned features include:
 
 ## Screenshots
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="45%"/>
+  <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="70%"/>
 </p>
 
 
