@@ -10,7 +10,7 @@ This project is a Windows-based malware scanner developed in C++ with OpenGL, us
 
 ## Implemented Features
 - **Signature scanning** using SHA-256 hashes for files.  
-- **Optimized hash lookup**: loads the hash database into memory and uses efficient search (logarithmic time) instead of looping through the file each time.  
+- **Optimized hash lookup**: Loads the hash database into memory using a `std::unordered_set` and checks hashes using constant-time average lookup (`O(1)`), instead of looping through the file each time (`O(n)`).
 - **Memory scanning** for known threats.  
 - **System tray integration** showing CPU and memory statistics.  
 - **Graphical interface** fully implemented with OpenGL.  
