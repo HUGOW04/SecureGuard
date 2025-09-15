@@ -33,7 +33,7 @@ void Scan::recursiveIterator()
             std::tm timeinfo;
             localtime_s(&timeinfo, &rawtime); // safer version for Windows
 
-            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M", &timeinfo);
             std::string currentTime(buffer);
 
             std::ofstream logFile("logs/logfile.txt", std::ios::app);
@@ -134,7 +134,7 @@ void Scan::fastScan()
             std::tm timeinfo;
             localtime_s(&timeinfo, &rawtime); // safer version for Windows
 
-            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M", &timeinfo);
             std::string currentTime(buffer);
 
             std::ofstream logFile("logs/logfile.txt", std::ios::app);
