@@ -38,6 +38,7 @@ Planned features include:
 ## Screenshots
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="100%"/>
-  <img src="Screenshot 2025-09-15 202015" src="https://github.com/user-attachments/assets/7cca9a62-fc73-43a7-981b-0fa808a4b203" alt="AntiVirus Scan Interface" width="100%"/>
+  <img width="900" height="475" alt="Screenshot 2025-09-15 202015" src="https://github.com/user-attachments/assets/823d4dcc-23d2-41d3-a01d-375bc298dd29" />
 </p>
+
 
