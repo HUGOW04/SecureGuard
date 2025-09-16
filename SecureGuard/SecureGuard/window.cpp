@@ -1,4 +1,4 @@
-﻿#include "window.h"
+#include "window.h"
 
 Window::Window(int width, int height, const char* title)
     : m_Width(width), m_Height(height), m_Title(title)
@@ -242,7 +242,7 @@ void Window::drop_callback(GLFWwindow* window, int count, const char** paths)
     if (!win->scan) return;
 
     // Drop area bounds
-    float rectX = 530.0f;
+    float rectX = 540.0f;
     float rectY = 120.0f;
     float rectWidth = 340.0f;
     float rectHeight = 190.0f;
@@ -907,7 +907,7 @@ void Window::handleEvents()
         {
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Scan", 1.0f, 1.0f, 1.0f, 1.0f);
             renderFont(m_Italic.get(), 260.0f, 110.0f, "Panel", 1.0f, 1.0f, 1.0f, 1.0f);
-            renderFont(m_Italic.get(), 530.0f, 110.0f, "Drag and Drop", 1.0f, 1.0f, 1.0f, 1.0f);
+            renderFont(m_Italic.get(), 540.0f, 110.0f, "Drag and Drop", 1.0f, 1.0f, 1.0f, 1.0f);
             //renderFont(m_Light.get(), 180.0f, 60.0f, "Real-time malware detection and removal", 1.0f, 1.0f, 1.0f, 1.0f);
             m_ScanPanel->render();
 
