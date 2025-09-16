@@ -2,8 +2,8 @@
 
 ## Project Overview
 This is an **improved version** of my previous antivirus applications:  
-- [First AntiVirus Project](https://github.com/HUGOW04/AntiVirus)  
-- [Second AntiVirus Project](https://github.com/HUGOW04/TuAntivirus)  
+- [First AntiVirus Project](https://github.com/HUGOW04/TuAntivirus)  
+- [Second AntiVirus Project](https://github.com/HUGOW04/AntiVirus)  
 
 This project is a **Windows-based malware scanner** developed in **C++ with OpenGL**, using **SHA-256 hashing** for secure file comparison. It provides a modern interface, improved performance, and stronger detection capabilities compared to previous versions.
 
