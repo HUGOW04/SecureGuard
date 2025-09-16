@@ -908,6 +908,8 @@ void Window::handleEvents()
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Scan", 1.0f, 1.0f, 1.0f, 1.0f);
             renderFont(m_Italic.get(), 260.0f, 110.0f, "Panel", 1.0f, 1.0f, 1.0f, 1.0f);
             renderFont(m_Italic.get(), 540.0f, 110.0f, "Drag and Drop", 1.0f, 1.0f, 1.0f, 1.0f);
+
+            renderFont(m_Italic.get(), 260.0f, 310.0f, "Logging", 1.0f, 1.0f, 1.0f, 1.0f);
             //renderFont(m_Light.get(), 180.0f, 60.0f, "Real-time malware detection and removal", 1.0f, 1.0f, 1.0f, 1.0f);
             m_ScanPanel->render();
 
