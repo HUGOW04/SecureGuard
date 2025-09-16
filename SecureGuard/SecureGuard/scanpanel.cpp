@@ -48,9 +48,9 @@ void Scanpanel::render()
 {
 
     glColor3f(0.2196f, 0.2549f, 0.3137f);
-    drawRoundedRect(260.0f, 120.0f,260.0f, 120.0f, 20.0f);
+    drawRoundedRect(260.0f, 120.0f,270.0f, 120.0f, 20.0f);
 
-    drawRoundedRect(530.0f, 120.0f, 340.0f, 190.0f, 20.0f);
+    drawRoundedRect(540.0f, 120.0f, 340.0f, 190.0f, 20.0f);
 
     for (auto& button : m_Buttons)
     {
