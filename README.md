@@ -43,11 +43,11 @@ Planned features include:
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fc922aae-9f29-48d2-bfed-2c38f47cf5d4" alt="AntiVirus Main Interface" width="100%"/>
   <img width="900" height="475" alt="image" src="https://github.com/user-attachments/assets/8041c5f2-3b8e-4a1b-88ea-8ff96af96684" />
+</p>
 
 
 <p align="center">
-   <img width="900" height="475" alt="image" src="https://github.com/user-attachments/assets/c9ca57a1-57d0-429d-916a-73b2d9974c9f"
-/>
-
-
+   <img width="900" height="475" alt="image" src="https://github.com/user-attachments/assets/c9ca57a1-57d0-429d-916a-73b2d9974c9f"/>
 </p>
+
+
