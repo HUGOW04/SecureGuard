@@ -1,7 +1,18 @@
 #include "scan.h"
 
-Scan::Scan()
+Scan::Scan(bool handle)
+   : m_handle(handle)
 {
+    if (m_handle)
+    {
+        std::cout << "Kernel driver available - enabling kernel enforcement." << std::endl;
+    }
+    else
+    {
+        std::cout << "Kernel driver not found - running user-mode only. (No blocking)" << std::endl;
+    }
+
+
     load_hashes();
     getStartupApplications();
 }
@@ -50,7 +61,7 @@ void Scan::recursiveIterator()
                     shouldSkip = true;
                     if (it->is_directory())
                     {
-                        it.disable_recursion_pending(); // Hoppa över underkataloger helt
+                        it.disable_recursion_pending(); // Hoppa Ã¶ver underkataloger helt
                     }
                     break;
                 }
