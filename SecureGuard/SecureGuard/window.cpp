@@ -16,7 +16,24 @@ Window::Window(int width, int height, const char* title)
         m_Hash->unzip();
     }
 
-    m_Scan = std::make_unique<Scan>();
+    HANDLE handle = CreateFileW(
+        L"\\\\.\\SecureGuardKernel",
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    bool kernelAvailable = (handle != INVALID_HANDLE_VALUE);
+
+    if (kernelAvailable) {
+        CloseHandle(handle);
+    }
+
+    m_Scan = std::make_unique<Scan>(kernelAvailable);
+
 
     initGLFW();
     createWindow();
