@@ -16,7 +16,7 @@
 class Scan
 {
 public:
-    Scan();
+    Scan(bool handle);
     void recursiveIterator();
     std::string fileToSHA256(const std::string& filePath);
     bool compareSHA256File(const std::string& hashPath);
@@ -35,6 +35,7 @@ private:
     void getStartupApplications();
     std::string GetProcessName(DWORD pid);
 private:
+    bool m_handle;
     // buffers
     std::vector<std::string> logBuffer;
     std::vector<std::string> threatBuffer;
