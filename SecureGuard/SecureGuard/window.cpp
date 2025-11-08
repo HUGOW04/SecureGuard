@@ -20,16 +20,21 @@ Window::Window(int width, int height, const char* title)
         L"\\\\.\\SecureGuardKernel",
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
+        nullptr,
         OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL,
-        NULL
+        nullptr
     );
+
 
     bool kernelAvailable = (handle != INVALID_HANDLE_VALUE);
 
     if (kernelAvailable) {
-        CloseHandle(handle);
+        std::cout << "Kernel driver available - enabling kernel enforcement." << std::endl;
+        CloseHandle(handle); // stäng direkt, du behöver inte handtaget här
+    }
+    else {
+        std::cout << "Kernel driver not found - running user-mode only. (No blocking)" << std::endl;
     }
 
     m_Scan = std::make_unique<Scan>(kernelAvailable);
@@ -60,14 +65,14 @@ Window::Window(int width, int height, const char* title)
 
     // sidebar buttons
     sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Regular.get(), m_HomeImage.get()));
-    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Regular.get(),m_FirewallImage.get()));
-    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get(),m_ScanImage.get()));
+    sidebarButtons.push_back(Button(20, 110, 200, 40, "Firewall", "firewall", m_Regular.get(), m_FirewallImage.get()));
+    sidebarButtons.push_back(Button(20, 160, 200, 40, "Scan", "scan", m_Regular.get(), m_ScanImage.get()));
     sidebarButtons.push_back(Button(20, 210, 200, 40, "Performance", "performance", m_Regular.get(), m_PerformanceImage.get()));
     sidebarButtons.push_back(Button(20, 260, 200, 40, "Setting", "setting", m_Regular.get(), m_SettinsImage.get()));
-    
+
     // system buttons
-    systemButtons.push_back(Button(m_Width - 20, 0, 20, 20, "x", "x", m_Italic.get(),NULL));
-    systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get(),NULL));
+    systemButtons.push_back(Button(m_Width - 20, 0, 20, 20, "x", "x", m_Italic.get(), NULL));
+    systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get(), NULL));
 
     // overview widget
     overviewWidget.push_back(Widget(265, 110, 190, 140, &status, "Security Status", m_Italic.get(), m_Italic.get()));
@@ -118,20 +123,20 @@ Window::Window(int width, int height, const char* title)
 
 
     // consoles
-    
+
     m_Scanconsole.push_back(Console(260, 320, 620, 140, m_Scan->getLogBuffer(), m_Italic.get()));
-    
+
     m_Performanceconsole.push_back(Console(580, 125, 300, 330, processUsageList, m_Italic.get()));
 
     // toggle
-    firewallToggle.push_back(Toggle(800, 170, 40, 20,"1"));
+    firewallToggle.push_back(Toggle(800, 170, 40, 20, "1"));
 
     settingToggle.push_back(Toggle(800, 170, 40, 20, "protection"));
     settingToggle.push_back(Toggle(800, 220, 40, 20, "updates"));
     settingToggle.push_back(Toggle(800, 270, 40, 20, "startup"));
 
 
-    
+
 
     std::vector<std::string> settingsTitle = {
      "Real-time Protection",
@@ -144,7 +149,7 @@ Window::Window(int width, int height, const char* title)
         "Automatically download and install virus definition updates.",
         "Starts automatically with your system for continuous protection."
     };
-    
+
     std::vector<std::string> firewallTitle = {
     "Inbound Rules",
     "Outbound Rules",
@@ -167,9 +172,9 @@ Window::Window(int width, int height, const char* title)
     m_System = std::make_unique<System>(systemButtons);
     m_Overview = std::make_unique<Overview>(overviewWidget);
     m_ScanPanel = std::make_unique<Scanpanel>(scanButtons, m_Scanconsole);
-    m_Setting = std::make_unique<Setting>(m_Regular.get(), m_Light.get(),settingsTitle, settingsDescription,settingToggle);
+    m_Setting = std::make_unique<Setting>(m_Regular.get(), m_Light.get(), settingsTitle, settingsDescription, settingToggle);
     m_RenderPerformance = std::make_unique<RenderPerformance>(performances, m_Performanceconsole);
-    
+
 }
 
 void Window::createDirectorys()
@@ -375,7 +380,7 @@ void Window::cursor_position_callback(GLFWwindow* window, double xpos, double yp
     }
     else if (win->performance)
     {
-        
+
         for (auto& c : win->m_Performanceconsole)
         {
             if (c.draggingScrollbar)
@@ -513,7 +518,7 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
                 }
             }
 
-            
+
         }
         else if (win->setting)
         {
@@ -534,14 +539,14 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
                     }
                     else if (t.getName() == "startup")
                     {
-                      
+
                         if (t.getState()) {
                             // Add to startup using the API
-                           
+
                         }
                         else {
                             // Remove from startup using the API
-                            
+
                         }
                         std::cout << "startup clicked! state: " << t.getState() << std::endl;
                     }
@@ -557,7 +562,7 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
                     mouseY >= t.getY() && mouseY <= t.getY() + t.getHeight())
                 {
                     t.setState(!t.getState());
-                    
+
                 }
             }
         }
@@ -851,7 +856,7 @@ void Window::setupProjection()
 
 void Window::handleEvents()
 {
-   
+
     while (!glfwWindowShouldClose(m_Window))
     {
         glClearColor(0.13f, 0.16f, 0.21f, 0.1f);
@@ -910,9 +915,9 @@ void Window::handleEvents()
             //Security Overview
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Dashboard", 1.0f, 1.0f, 1.0f, 1.0f);
             renderFont(m_Bold.get(), 260.0f, 320.0f, "Quick Actions", 1.0f, 1.0f, 1.0f, 1.0f);
-            
+
             m_Overview->render();
-           
+
         }
         else if (firewall)
         {
@@ -957,7 +962,7 @@ void Window::handleEvents()
             renderFont(m_Bold.get(), 260.0f, 70.0f, "Setting", 1.0f, 1.0f, 1.0f, 1.0f);
             m_Setting->render();
         }
-        
+
         std::time_t t = std::time(nullptr);
         std::tm now{};
         localtime_s(&now, &t);
