@@ -1,5 +1,74 @@
 #include "window.h"
 
+#define AV_DEVICE_TYPE 0x8000
+#define IOCTL_BLACKLIST_PROCESS CTL_CODE(AV_DEVICE_TYPE, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_WHITELIST_PROCESS CTL_CODE(AV_DEVICE_TYPE, 0x803, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_KILL_PROCESS      CTL_CODE(AV_DEVICE_TYPE, 0x804, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+bool SendStringIoctl(HANDLE hDevice, DWORD ioctl, const wchar_t* name) {
+    if (!hDevice || hDevice == INVALID_HANDLE_VALUE) return false;
+    DWORD inSize = (DWORD)((wcslen(name) + 1) * sizeof(wchar_t));
+    DWORD bytesReturned = 0;
+    BOOL ok = DeviceIoControl(hDevice,
+        ioctl,
+        (LPVOID)name,
+        inSize,
+        NULL, 0,
+        &bytesReturned, NULL);
+    if (!ok) {
+        std::cout << "DeviceIoControl failed, error: " << GetLastError() << "\n";
+    }
+    return ok == TRUE;
+}
+
+bool SendKillIoctl(HANDLE hDevice, DWORD pid) {
+    if (!hDevice || hDevice == INVALID_HANDLE_VALUE) return false;
+    DWORD bytesReturned = 0;
+    BOOL ok = DeviceIoControl(
+        hDevice,
+        IOCTL_KILL_PROCESS,
+        &pid,
+        sizeof(DWORD),
+        NULL, 0,
+        &bytesReturned,
+        NULL
+    );
+    if (!ok) {
+        std::cout << "DeviceIoControl(KILL) failed, error: " << GetLastError() << "\n";
+    }
+    return ok == TRUE;
+}
+
+DWORD GetPIDByProcessName(const wchar_t* processName)
+{
+    DWORD PID = 0;
+    HANDLE hProcessSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hProcessSnapshot == INVALID_HANDLE_VALUE)
+        return 0;
+
+    PROCESSENTRY32W PE32 = { 0 };
+    PE32.dwSize = sizeof(PROCESSENTRY32W);
+
+    if (!Process32FirstW(hProcessSnapshot, &PE32))
+    {
+        CloseHandle(hProcessSnapshot);
+        return 0;
+    }
+
+    do
+    {
+        if (_wcsicmp(processName, PE32.szExeFile) == 0)
+        {
+            PID = PE32.th32ProcessID;
+            break;
+        }
+    } while (Process32NextW(hProcessSnapshot, &PE32));
+
+    CloseHandle(hProcessSnapshot);
+    return PID;
+}
+
+
 Window::Window(int width, int height, const char* title)
     : m_Width(width), m_Height(height), m_Title(title)
 {
@@ -16,28 +85,32 @@ Window::Window(int width, int height, const char* title)
         m_Hash->unzip();
     }
 
-    HANDLE handle = CreateFileW(
-        L"\\\\.\\SecureGuardKernel",
+    HANDLE h = CreateFileW(L"\\\\.\\SecureGuardKernel",
         GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        nullptr
-    );
+        0, NULL, OPEN_EXISTING, 0, NULL);
+    if (h == INVALID_HANDLE_VALUE) {
+        std::cout << "Could not open driver. Error: " << GetLastError() << "\n";
+    }
 
+    //SendStringIoctl(h, IOCTL_BLACKLIST_PROCESS, L"Notepad.exe");
+    //SendStringIoctl(h, IOCTL_WHITELIST_PROCESS, L"explorer.exe");
 
-    bool kernelAvailable = (handle != INVALID_HANDLE_VALUE);
-
-    if (kernelAvailable) {
-        std::cout << "Kernel driver available - enabling kernel enforcement." << std::endl;
-        CloseHandle(handle); // stäng direkt, du behöver inte handtaget här
+    DWORD pid = GetPIDByProcessName(L"notepad.exe");
+    if (pid == 0) {
+        std::cout << "Process not found\n";
     }
     else {
-        std::cout << "Kernel driver not found - running user-mode only. (No blocking)" << std::endl;
+        if (SendKillIoctl(h, pid))
+            std::cout << "Process killed successfully\n";
+        else
+            std::cout << "Failed to kill process\n";
     }
 
-    m_Scan = std::make_unique<Scan>(kernelAvailable);
+    SendKillIoctl(h, pid);
+
+
+
+    m_Scan = std::make_unique<Scan>(true);
 
 
     initGLFW();
