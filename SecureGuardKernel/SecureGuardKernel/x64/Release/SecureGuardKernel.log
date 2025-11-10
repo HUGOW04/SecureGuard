@@ -1,0 +1,25 @@
+﻿  Building 'SecureGuardKernel' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
+  Stamping x64\Release\SecureGuardKernel.inf
+  Stamping [Version] section with DriverVer=11/10/2025,16.18.34.310
+  main.c
+  SecureGuardKernel.vcxproj -> C:\Users\hugo\source\repos\SecureGuardKernel\x64\Release\SecureGuardKernel.sys
+  Done Adding Additional Store
+  Successfully signed: C:\Users\hugo\source\repos\SecureGuardKernel\x64\Release\SecureGuardKernel.sys
+  
+  Driver is 'Universal'.
+  .........................
+  Signability test complete.
+  
+  Errors:
+  None
+  
+  Warnings:
+  None
+  
+  Catalog generation complete.
+  C:\Users\hugo\source\repos\SecureGuardKernel\x64\Release\SecureGuardKernel\secureguardkernel.cat
+  Done Adding Additional Store
+  Successfully signed: C:\Users\hugo\source\repos\SecureGuardKernel\x64\Release\SecureGuardKernel\secureguardkernel.cat
+  
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.

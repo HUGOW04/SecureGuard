@@ -1,0 +1,62 @@
+;
+; SecureGuardKernel.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = SecureGuardKernel.cat
+DriverVer = 11/08/2025,15.59.51.995
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+SecureGuardKernel.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NTamd64.10.0...16299]
+%SecureGuardKernel.DeviceDesc% = SecureGuardKernel_Device, Root\SecureGuardKernel ; TODO: edit hw-id
+
+[SecureGuardKernel_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+SecureGuardKernel.sys
+
+;-------------- Service installation
+[SecureGuardKernel_Device.NT.Services]
+AddService = SecureGuardKernel,%SPSVCINST_ASSOCSERVICE%, SecureGuardKernel_Service_Inst
+
+; -------------- SecureGuardKernel driver install sections
+[SecureGuardKernel_Service_Inst]
+DisplayName    = %SecureGuardKernel.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\SecureGuardKernel.sys
+
+[SecureGuardKernel_Device.NT.Wdf]
+KmdfService = SecureGuardKernel, SecureGuardKernel_wdfsect
+
+[SecureGuardKernel_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "SecureGuardKernel Installation Disk"
+SecureGuardKernel.DeviceDesc = "SecureGuardKernel Device"
+SecureGuardKernel.SVCDESC = "SecureGuardKernel Service"
