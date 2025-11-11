@@ -32,11 +32,9 @@ This project is a **Windows-based malware scanner** developed in **C++ with Open
 ## Future Improvements
 Planned enhancements:  
 
-- Phishing email protection with **Have I Been Pwned** integration.  
 - Sandbox execution for suspicious programs.  
 - AI/ML-based detection of unknown threats.  
 - Quarantine system to isolate/remove malware.  
-- Automatic virus definition updates.  
 
 ---
 
