@@ -92,7 +92,7 @@ Window::Window(int width, int height, const char* title)
         std::cout << "Could not open driver. Error: " << GetLastError() << "\n";
     }
 
-    //SendStringIoctl(h, IOCTL_BLACKLIST_PROCESS, L"Notepad.exe");
+    SendStringIoctl(h, IOCTL_BLACKLIST_PROCESS, L"notepad.exe");
     //SendStringIoctl(h, IOCTL_WHITELIST_PROCESS, L"explorer.exe");
 
     DWORD pid = GetPIDByProcessName(L"notepad.exe");
@@ -106,11 +106,11 @@ Window::Window(int width, int height, const char* title)
             std::cout << "Failed to kill process\n";
     }
 
-    SendKillIoctl(h, pid);
+    //SendKillIoctl(h, pid);
 
 
 
-    m_Scan = std::make_unique<Scan>(true);
+    m_Scan = std::make_unique<Scan>();
 
 
     initGLFW();
