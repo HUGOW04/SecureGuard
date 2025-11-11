@@ -13,6 +13,11 @@
 #include <ctime>
 #include <array>
 
+#define AV_DEVICE_TYPE 0x8000
+#define IOCTL_BLACKLIST_PROCESS CTL_CODE(AV_DEVICE_TYPE, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_WHITELIST_PROCESS CTL_CODE(AV_DEVICE_TYPE, 0x803, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_KILL_PROCESS      CTL_CODE(AV_DEVICE_TYPE, 0x804, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
 class Scan
 {
 public:
@@ -27,6 +32,7 @@ public:
     const std::vector<std::string>& getThreatBuffer() const { return threatBuffer; }
     void setLogBuffer(const std::string& log) { logBuffer.push_back(log); }
     void setThreatBuffer(const std::string& threat) { threatBuffer.push_back(threat); }
+    void realTimeProtection(const std::string& folderPath);
 private:
     void load_hashes();
     bool checkFileChange(const std::string& filePath, const std::string& hash);
