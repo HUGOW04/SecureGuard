@@ -662,5 +662,6 @@ void Scan::realTimeProtection(const std::string& folderPath)
         }
     }
 
+    CloseHandle(overlapped.hEvent);
     CloseHandle(hDir);
 }
