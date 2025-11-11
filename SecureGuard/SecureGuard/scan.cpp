@@ -20,7 +20,7 @@ void Scan::recursiveIterator()
     int skipCount = sizeof(skipDirs) / sizeof(skipDirs[0]);
 
     char buffer[80];
-    
+
     const size_t maxFileSize = 100 * 1024 * 1024; // 100MB
 
     for (auto it = std::filesystem::recursive_directory_iterator(
@@ -66,7 +66,7 @@ void Scan::recursiveIterator()
                     continue;
                 }
 
-                
+
                 if (!hasMagicBytes(strPath)) {
                     // Magic byte mismatch, log it
                     std::ofstream threatFile("logs/threat_log.txt", std::ios::app);
@@ -118,7 +118,7 @@ void Scan::fastScan()
     DWORD username_len = sizeof(username);
     GetUserNameA(username, &username_len);
 
-    std::string path = "C:\\Users\\"+ std::string(username)+"\\Downloads";
+    std::string path = "C:\\Users\\" + std::string(username) + "\\Downloads";
 
     char buffer[80];
 
@@ -197,7 +197,7 @@ void Scan::fastScan()
 }
 
 void Scan::removeFile(const std::string& filePath)
-{  
+{
     remove(filePath.c_str());
 }
 
@@ -383,30 +383,10 @@ void Scan::getStartupApplications()
 
 
 
-bool Scan::hasMagicBytes(const std::string& filePath)
-{
-    std::ifstream file(filePath, std::ios::binary);
-    if (!file.is_open()) return false;
 
-    std::string ext = std::filesystem::path(filePath).extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    auto it = extensionMagicMap.find(ext);
 
-    // Only validate files that have strict magic bytes defined
-    if (it == extensionMagicMap.end()) {
-        return true; // skip unknown or non-strict files
-    }
 
-    const std::vector<uint8_t>& magic = it->second;
-    if (magic.empty()) return true;
-
-    std::vector<uint8_t> buffer(magic.size());
-    file.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
-    if (file.gcount() < static_cast<std::streamsize>(magic.size())) return false;
-
-    return std::equal(magic.begin(), magic.end(), buffer.begin());
-}
 
 
 
@@ -557,7 +537,7 @@ bool Scan::compareSHA256Str(const std::string& hashStr)
 {
     if (hash_set.find(hashStr) != hash_set.end())
     {
-        
+
         return true;
     }
 
@@ -575,8 +555,8 @@ void Scan::load_hashes()
         size_t start = line.find_first_not_of(" \t\r\n");
         size_t end = line.find_last_not_of(" \t\r\n");
         std::string trimmed = (start == std::string::npos || end == std::string::npos)
-                                ? ""
-                                : line.substr(start, end - start + 1);
+            ? ""
+            : line.substr(start, end - start + 1);
 
 
         if (!trimmed.empty())
@@ -584,6 +564,34 @@ void Scan::load_hashes()
             hash_set.insert(trimmed);
         }
     }
+}
+
+bool Scan::hasMagicBytes(const std::string& filePath)
+{
+
+    std::string ext = std::filesystem::path(filePath).extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
+
+    // Skippa alla filer med okända extensioner
+    auto it = extensionMagicMap.find(ext);
+    if (it == extensionMagicMap.end())
+        return true;
+
+    // Öppna filen
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file)
+        return true; // Kunde inte öppna – skippa
+
+    const std::vector<uint8_t>& magicBytes = it->second;
+    std::vector<uint8_t> buffer(magicBytes.size());
+
+    file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
+    std::streamsize bytesRead = file.gcount();
+
+    if (bytesRead < static_cast<std::streamsize>(magicBytes.size()))
+        return true; // Kunde inte läsa tillräckligt – skippa
+
+    return buffer == magicBytes;
 }
 
 void Scan::realTimeProtection(const std::string& folderPath)
@@ -639,17 +647,9 @@ void Scan::realTimeProtection(const std::string& folderPath)
                 case FILE_ACTION_ADDED:
                 case FILE_ACTION_MODIFIED:
                     std::cout << "[Real-Time] Change detected: " << fullPath << std::endl;
-
-                    if (!hasMagicBytes(fullPath)) {
+                    if (!hasMagicBytes(fullPath))
                         std::cout << "[Magic Mismatch] " << fullPath << std::endl;
-                    }
-
-                    if (compareSHA256File(fullPath)) {
-                        std::cout << "[SHA-256 MATCH] Threat detected: " << fullPath << std::endl;
-                        //removeFile(fullPath);
-                    }
                     break;
-
                 default:
                     break;
                 }
@@ -664,4 +664,3 @@ void Scan::realTimeProtection(const std::string& folderPath)
 
     CloseHandle(hDir);
 }
-
