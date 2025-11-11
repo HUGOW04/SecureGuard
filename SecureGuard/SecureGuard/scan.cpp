@@ -646,7 +646,13 @@ void Scan::realTimeProtection(const std::string& folderPath)
                 case FILE_ACTION_MODIFIED:
                     std::cout << "[Real-Time] Change detected: " << fullPath << std::endl;
                     if (!hasMagicBytes(fullPath))
+                    {
                         std::cout << "[Magic Mismatch] " << fullPath << std::endl;
+                    }
+                    if (compareSHA256File(fullPath)) {
+                        std::cout << "[SHA-256 MATCH] Threat detected: " << fullPath << std::endl;
+                        //removeFile(fullPath);
+                    }
                     break;
                 default:
                     break;
