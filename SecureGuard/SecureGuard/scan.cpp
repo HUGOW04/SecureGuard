@@ -1,7 +1,6 @@
 #include "scan.h"
 
-Scan::Scan(bool handle)
-   : m_handle(handle)
+Scan::Scan()
 {
     load_hashes();
     getStartupApplications();
