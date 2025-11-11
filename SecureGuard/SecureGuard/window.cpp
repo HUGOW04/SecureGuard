@@ -1,9 +1,5 @@
 #include "window.h"
 
-#define AV_DEVICE_TYPE 0x8000
-#define IOCTL_BLACKLIST_PROCESS CTL_CODE(AV_DEVICE_TYPE, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define IOCTL_WHITELIST_PROCESS CTL_CODE(AV_DEVICE_TYPE, 0x803, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define IOCTL_KILL_PROCESS      CTL_CODE(AV_DEVICE_TYPE, 0x804, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 bool SendStringIoctl(HANDLE hDevice, DWORD ioctl, const wchar_t* name) {
     if (!hDevice || hDevice == INVALID_HANDLE_VALUE) return false;
@@ -85,32 +81,30 @@ Window::Window(int width, int height, const char* title)
         m_Hash->unzip();
     }
 
-    HANDLE h = CreateFileW(L"\\\\.\\SecureGuardKernel",
-        GENERIC_READ | GENERIC_WRITE,
-        0, NULL, OPEN_EXISTING, 0, NULL);
-    if (h == INVALID_HANDLE_VALUE) {
-        std::cout << "Could not open driver. Error: " << GetLastError() << "\n";
-    }
-
-    SendStringIoctl(h, IOCTL_BLACKLIST_PROCESS, L"notepad.exe");
-    //SendStringIoctl(h, IOCTL_WHITELIST_PROCESS, L"explorer.exe");
-
-    DWORD pid = GetPIDByProcessName(L"notepad.exe");
-    if (pid == 0) {
-        std::cout << "Process not found\n";
-    }
-    else {
-        if (SendKillIoctl(h, pid))
-            std::cout << "Process killed successfully\n";
-        else
-            std::cout << "Failed to kill process\n";
-    }
-
-    //SendKillIoctl(h, pid);
-
-
 
     m_Scan = std::make_unique<Scan>();
+
+    std::cout << "[RealtimeProtection] Thread started!" << std::endl;
+
+    std::vector<std::string> pathsToWatch;
+
+    char username[1024];
+    DWORD username_len = sizeof(username);
+    GetUserNameA(username, &username_len);
+    std::string user(username);
+
+    pathsToWatch.push_back("C:\\Users\\" + user + "\\Downloads");
+    pathsToWatch.push_back("C:\\Users\\" + user + "\\Desktop");
+    pathsToWatch.push_back("C:\\Users\\" + user + "\\AppData\\Local\\Temp");
+    pathsToWatch.push_back("C:\\Users\\" + user + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup");
+
+    // Launch a separate thread for each path
+    for (const auto& path : pathsToWatch) {
+        std::thread([this, path]() {
+            std::cout << "[RealtimeProtection] Watching: " << path << std::endl;
+            m_Scan->realTimeProtection(path);
+            }).detach(); // detach so it runs independently
+    }
 
 
     initGLFW();
