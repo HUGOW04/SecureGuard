@@ -145,6 +145,9 @@ private:
     // performance
     std::vector<Performance> performances;
 
+    // Add this line:
+    std::thread m_RealtimeThread;
+
 
 
 };
