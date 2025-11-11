@@ -23,18 +23,19 @@ This project is a **Windows-based malware scanner** developed in **C++ with Open
 - **System tray integration** with CPU and memory statistics.  
 - **Modern graphical interface** fully implemented in OpenGL.  
 - **Desktop notifications** for scan results.
-- Real-time detection of **newly added files** before execution.  
-
+- Real-time detection of **newly added files** before execution.
+- Kernel-level antivirus integration for deeper protection.  
+- Network scanning using **WinAPI hooks**.
+  
 ---
 
 ## Future Improvements
 Planned enhancements:  
-- Network scanning using **WinAPI hooks**.  
+
 - Phishing email protection with **Have I Been Pwned** integration.  
 - Sandbox execution for suspicious programs.  
 - AI/ML-based detection of unknown threats.  
 - Quarantine system to isolate/remove malware.  
-- Kernel-level antivirus integration for deeper protection.  
 - Automatic virus definition updates.  
 
 ---
