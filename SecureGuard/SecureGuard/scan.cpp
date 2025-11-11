@@ -572,15 +572,13 @@ bool Scan::hasMagicBytes(const std::string& filePath)
     std::string ext = std::filesystem::path(filePath).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
 
-    // Skippa alla filer med okända extensioner
     auto it = extensionMagicMap.find(ext);
     if (it == extensionMagicMap.end())
         return true;
 
-    // Öppna filen
     std::ifstream file(filePath, std::ios::binary);
     if (!file)
-        return true; // Kunde inte öppna – skippa
+        return true; 
 
     const std::vector<uint8_t>& magicBytes = it->second;
     std::vector<uint8_t> buffer(magicBytes.size());
@@ -589,7 +587,7 @@ bool Scan::hasMagicBytes(const std::string& filePath)
     std::streamsize bytesRead = file.gcount();
 
     if (bytesRead < static_cast<std::streamsize>(magicBytes.size()))
-        return true; // Kunde inte läsa tillräckligt – skippa
+        return true; 
 
     return buffer == magicBytes;
 }
