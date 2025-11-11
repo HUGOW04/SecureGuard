@@ -586,3 +586,82 @@ void Scan::load_hashes()
     }
 }
 
+void Scan::realTimeProtection(const std::string& folderPath)
+{
+    HANDLE hDir = CreateFileA(
+        folderPath.c_str(),
+        FILE_LIST_DIRECTORY,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_FLAG_BACKUP_SEMANTICS,
+        NULL
+    );
+
+    if (hDir == INVALID_HANDLE_VALUE) {
+        std::cerr << "Failed to open folder: " << folderPath << std::endl;
+        return;
+    }
+
+    char buffer[1024];
+    OVERLAPPED overlapped = {};
+    overlapped.hEvent = CreateEvent(NULL, FALSE, 0, NULL);
+
+    while (true) {
+        DWORD bytesReturned = 0;
+
+        BOOL success = ReadDirectoryChangesW(
+            hDir,
+            buffer,
+            sizeof(buffer),
+            TRUE,
+            FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
+            &bytesReturned,
+            &overlapped,
+            NULL
+        );
+
+        if (!success) {
+            std::cerr << "ReadDirectoryChangesW failed on " << folderPath << std::endl;
+            break;
+        }
+
+        DWORD waitStatus = WaitForSingleObject(overlapped.hEvent, INFINITE);
+        if (waitStatus == WAIT_OBJECT_0) {
+            FILE_NOTIFY_INFORMATION* event = (FILE_NOTIFY_INFORMATION*)buffer;
+
+            while (true) {
+                std::wstring fileNameW(event->FileName, event->FileNameLength / sizeof(wchar_t));
+                std::string fileName(fileNameW.begin(), fileNameW.end());
+                std::string fullPath = folderPath + "\\" + fileName;
+
+                switch (event->Action) {
+                case FILE_ACTION_ADDED:
+                case FILE_ACTION_MODIFIED:
+                    std::cout << "[Real-Time] Change detected: " << fullPath << std::endl;
+
+                    if (!hasMagicBytes(fullPath)) {
+                        std::cout << "[Magic Mismatch] " << fullPath << std::endl;
+                    }
+
+                    if (compareSHA256File(fullPath)) {
+                        std::cout << "[SHA-256 MATCH] Threat detected: " << fullPath << std::endl;
+                        //removeFile(fullPath);
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+
+                if (event->NextEntryOffset != 0)
+                    event = (FILE_NOTIFY_INFORMATION*)((char*)event + event->NextEntryOffset);
+                else
+                    break;
+            }
+        }
+    }
+
+    CloseHandle(hDir);
+}
+
