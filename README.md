@@ -25,7 +25,7 @@ This project is a **Windows-based malware scanner** developed in **C++ with Open
 - **Desktop notifications** for scan results.
 - Real-time detection of **newly added files** before execution.
 - Kernel-level antivirus integration for deeper protection.  
-- Network scanning using **WinAPI hooks**.
+
   
 ---
 
@@ -35,7 +35,7 @@ Planned enhancements:
 - Sandbox execution for suspicious programs.  
 - AI/ML-based detection of unknown threats.  
 - Quarantine system to isolate/remove malware.  
-
+- Network scanning using **WinAPI hooks**.
 ---
 
 
