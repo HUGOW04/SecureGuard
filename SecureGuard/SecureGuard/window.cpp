@@ -129,6 +129,7 @@ Window::Window(int width, int height, const char* title)
     m_FilescanImage = std::make_unique<Loadimage>("images/filescan.png");
     m_MemoryscanImage = std::make_unique<Loadimage>("images/memscan.png");
     m_DropImage = std::make_unique<Loadimage>("images/draganddrop.png");
+    m_ProtectedShield = std::make_unique<Loadimage>("images/protected.png");
 
     // sidebar buttons
     sidebarButtons.push_back(Button(20, 60, 200, 40, "Overview", "overview", m_Regular.get(), m_HomeImage.get()));
@@ -142,13 +143,13 @@ Window::Window(int width, int height, const char* title)
     systemButtons.push_back(Button(m_Width - 40, 0, 20, 20, "-", "-", m_Italic.get(), NULL));
 
     // overview widget
-    overviewWidget.push_back(Widget(265, 110, 190, 140, &status, "Security Status", m_Italic.get(), m_Italic.get()));
-    overviewWidget.push_back(Widget(475, 110, 190, 140, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get()));
-    overviewWidget.push_back(Widget(685, 110, 190, 140, &lastSystemScan, "Updates", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(265, 110, 190, 140, nullptr, "This PC is protected!", m_Italic.get(), m_Italic.get(), m_ProtectedShield.get()));
+    overviewWidget.push_back(Widget(475, 110, 190, 140, &threatsFound, "Threats Found", m_Italic.get(), m_Italic.get(),nullptr));
+    overviewWidget.push_back(Widget(685, 110, 190, 140, &lastUpdate, "Updates", m_Italic.get(), m_Italic.get(),nullptr));
 
     // Overview quick-actions
-    overviewWidget.push_back(Widget(265, 345, 290, 110, &threatsFound, "Run Quick Scan", m_Italic.get(), m_Italic.get()));
-    overviewWidget.push_back(Widget(590, 345, 285, 110, &lastSystemScan, "Scan History", m_Italic.get(), m_Italic.get()));
+    overviewWidget.push_back(Widget(265, 345, 290, 110, &threatsFound, "Run Quick Scan", m_Italic.get(), m_Italic.get(),nullptr));
+    overviewWidget.push_back(Widget(590, 345, 285, 110, &lastSystemScan, "Scan History", m_Italic.get(), m_Italic.get(),nullptr));
 
     // scanbuttons
     scanButtons.emplace_back(
