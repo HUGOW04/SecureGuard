@@ -41,7 +41,7 @@ Planned enhancements:
 
 ## Screenshots
 <p align="center">
-  <img width="900" height="475" alt="image" src="https://github.com/user-attachments/assets/23ed574c-00e8-4dd3-9fa6-78cbc3f06305" />
+  <img width="890" height="475" alt="image" src="https://github.com/user-attachments/assets/23ed574c-00e8-4dd3-9fa6-78cbc3f06305" />
   <img width="900" height="475" alt="Overview Dashboard" src="https://github.com/user-attachments/assets/8041c5f2-3b8e-4a1b-88ea-8ff96af96684" />
 </p>
 
