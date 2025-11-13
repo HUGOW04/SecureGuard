@@ -91,6 +91,7 @@ private:
     std::unique_ptr<Loadimage> m_FilescanImage;
     std::unique_ptr<Loadimage> m_MemoryscanImage;
     std::unique_ptr<Loadimage> m_DropImage;
+    std::unique_ptr<Loadimage> m_ProtectedShield;
     int m_Width;
     int m_Height;
     int m_Vsync = 0;
@@ -114,6 +115,7 @@ private:
     std::string threatsFound = "0";
     std::string status = "Protected";
     std::string lastSystemScan = "never";
+    std::string lastUpdate = "never";
     std::string startupProcesses = "0";
     std::string cpuUsage = "0%";
     std::string memoryUsage = "0%";
