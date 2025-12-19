@@ -7,6 +7,15 @@ This is an **improved version** of my previous antivirus applications:
 
 This project is a **Windows-based malware scanner** developed in **C++ with OpenGL**, using **SHA-256 hashing** for secure file comparison. It provides a modern interface, improved performance, and stronger detection capabilities compared to previous versions.
 
+## Windows dependencies
+````
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+.\vcpkg install glew jsoncpp curl glfw3 libzip openssl
+
+````
+
 ---
 
 ## Implemented Features
