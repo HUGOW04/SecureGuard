@@ -1,5 +1,4 @@
 #include "button.h"
-#include "stb_easy_font.h"
 
 Button::Button(float x, float y, float width, float height,
     const std::string& id, const std::string& buttonText,
